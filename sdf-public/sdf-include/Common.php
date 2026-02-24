@@ -135,10 +135,10 @@ use PHPMailer\PHPMailer\Exception;
 
 function sendMail($to, $title, $content)
 {
-	require '../Core/Database/connect.php';
-	require '../Include/PHPMailer/Exception.php';
-	require '../Include/PHPMailer/PHPMailer.php';
-	require '../Include/PHPMailer/SMTP.php';
+	require __CONFIG_DIR__ . '/database.php';
+	require __INCLUDE_DIR__ . '/PHPMailer/Exception.php';
+	require __INCLUDE_DIR__ . '/PHPMailer/PHPMailer.php';
+	require __INCLUDE_DIR__ . '/PHPMailer/SMTP.php';
 	$sql = "SELECT title,smtp_host,smtp_username,smtp_password,smtp_port,smtp_secure FROM `mxgapi_config`;";
 	$result = $db->query($sql);
 	if ($result = $result->fetch_assoc()) {
@@ -200,7 +200,7 @@ function domainAuth($domain)
  */
 function addApiAccess($id)
 {
-	require __CORE_DIR__ . '/Database/connect.php';
+	require __CONFIG_DIR__ . '/database.php';
 	if (intval($id)) {
 		$get_access = $db->query("SELECT access FROM `mxgapi_api` WHERE `id` = '{$id}';");
 		if ($get_access) {
@@ -253,7 +253,7 @@ function getUserIp()
  */
 function is_spider()
 {
-	require __CORE_DIR__ . '/Database/connect.php';
+	require __CONFIG_DIR__ . '/database.php';
 	$agent = strtolower($_SERVER['HTTP_USER_AGENT']);
 	if (!empty($agent)) {
 		$spiderSite = array(
