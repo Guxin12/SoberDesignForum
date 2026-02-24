@@ -1,0 +1,34 @@
+<html>
+<head>
+    <title>预备安装</title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="install,安装,SDF管理系统" />
+    <meta name="description" content="SDF安装页面" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
+</head>
+<body>
+<s-page theme="auto">
+
+<s-appbar>
+  <div slot="headline"> 安装前须知 </div>
+</s-appbar>
+
+<s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
+欢迎使用 SoberDesignForum，在开始前，我们需要您数据库的一些信息，请你准备好如下信息并为 SoberDesignForum 创建一个数据库：
+<ol>
+    <li>数据库名</li>
+    <li>数据库用户名</li>
+    <li>数据库密码</li>
+    <li>数据库地址</li>
+    <li>数据库端口</li>
+    </ol>
+    <p>这些信息应该由你的服务器商提供，如果你没有这些信息请在安装之前联系他们，如果准备好了的话...</p>
+    <s-button style="display: flex" href="?action=install&step=1"> 现在就开始吧 ! </s-button>
+</s-card>
+
+</s-page>
+<script src="./sdf-public/sdf-assets/js/jquery.min.js"></script>
+<script src="./sdf-public/sdf-assets/js/sober.js"></script>
+</body>
+</html>

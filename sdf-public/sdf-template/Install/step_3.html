@@ -1,0 +1,104 @@
+<html>
+<head>
+    <title>第三步 - 配置邮件信息</title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="install,安装,API管理系统" />
+    <meta name="description" content="API管理系统安装页面" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./assets/css/style.css"/>
+</head>
+<body>
+<s-page theme="auto">
+    <s-appbar>
+        <div slot="headline"> 第三步 - 配置邮件信息 </div>
+    </s-appbar>
+    
+    <form action="./Core/install.php" method="post" id="installForm">
+        <!-- 隐藏字段用于传递值 -->
+        <input type="hidden" name="stphost" id="realhost">
+        <input type="hidden" name="stpusername" id="realUser">
+        <input type="hidden" name="stppassword" id="realPass">
+        <input type="hidden" name="stpport" id="realPort">
+        <input type="hidden" name="stpsecure" id="realsecure">        
+        <input type="hidden" name="step" value="3">
+        
+        <s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
+            <p>网站信息配置成功，接下来是需要填您的邮件信息，这非常重要，但是您仍然不必担心填错，以后可以再次修改并测试。</p>
+    	    <p>如果你不知道你的邮件信息，请到你的邮件服务商中查看。</p>
+            <br><br>
+            
+            <s-text-field 
+                label="SMTP 服务器" 
+                type="text"
+                data-name="host"
+                onchange="document.getElementById('realhost').value = this.value"
+            ></s-text-field>
+            
+            <s-text-field 
+                label="SMTP 用户名" 
+                type="text"
+                data-name="User"
+                onchange="document.getElementById('realUser').value = this.value"
+            ></s-text-field>
+
+            
+            <s-text-field 
+                label="SMTP 密码" 
+                type="password"
+                data-name="Pass"
+                onchange="document.getElementById('realPass').value = this.value"
+            ></s-text-field>
+
+            
+            <s-text-field 
+                label="SMTP 端口" 
+                type="number"
+                data-name="Port"
+                onchange="document.getElementById('realPort').value = this.value"
+            ></s-text-field>
+            <br>
+            如果你不知道你的加密类型这里通常有两种 ssl和tls
+            <br>
+            <s-text-field 
+                label="SMTP 加密类型" 
+                type="text"
+                data-name="secure"
+                onchange="document.getElementById('realsecure').value = this.value"
+            ></s-text-field>
+            
+
+    
+            <s-button 
+                type="filled"
+                onclick="submitForm()"
+                style="display: flex"
+            >下一步</s-button>
+        </s-card>
+    </form>
+</s-page>
+
+<script>
+function submitForm() {
+  // 确保所有字段都有值
+  let valid = true;
+  document.querySelectorAll('s-text-field').forEach(field => {
+    if(!field.value) {
+      valid = false;
+    }
+  });
+  
+  if(valid) {
+    document.getElementById('installForm').submit();
+  } else {
+    alert("请填写所有字段");
+  }
+}
+</script>
+
+
+<script src="./assets/js/jquery.min.js"></script>
+<script src="./assets/js/sober.js"></script>
+<script src="./assets/js/vue.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?php
+session_start();
+$_SESSION['install_step'] = 1;
+file_put_contents('./Core/chece/install.lock', true);
+?>
+<html>
+<head>
+    <title>安装完成！</title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="install,安装,API管理系统" />
+    <meta name="description" content="API管理系统安装页面" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./assets/css/style.css"/>
+</head>
+<body>
+<s-page theme="auto">
+
+<s-appbar>
+  <div slot="headline"> 安装完成 </div>
+</s-appbar>
+
+<s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
+<p>还沉浸在安装过程中？不过现在已经完成了，您现在可以访问前台，也可以到后台编辑更多信息。</p>
+    <s-button style="display: flex" href="?"> 去前台 </s-button>
+    <br>
+    <s-button style="display: flex" href="?action=admin&page=websetting"> 去后台设置 </s-button>
+</s-card>
+
+</s-page>
+<script src="./assets/js/jquery.min.js"></script>
+<script src="./assets/js/sober.js"></script>
+<script src="./assets/js/vue.js"></script>
+</body>
+</html>
