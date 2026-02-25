@@ -1,0 +1,8 @@
+# 忽略所有 .log 文件
+*.log
+
+# 忽略 .vscode 文件夹（IDE配置）
+.vscode/
+
+# 忽略.bak
+*.bak

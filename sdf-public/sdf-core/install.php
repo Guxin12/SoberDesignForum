@@ -131,24 +131,38 @@ if ($db->connect_error) {
         }
         break;
   	case '2':
-  		$title = $_POST['title'];
-  		$domain = $_POST['domain'];
-  		if($title && $username && $password && $email && $domain){
-  			$update_sql = "UPDATE `sdf-config` SET `title`='{$title}',`url`='http://{$domain}/';";
-  			$update_result = $db->query($update_sql);
-  			if($update_result){
-            	$_SESSION['install_step'] = 3;
-            	jump('../../?action=install&step=3');
-           		jsonError(0,'保存成功');
-           	}else{
-           		alert('保存失败', '../../?action=install&step=2');
-           		jsonError(-1,"保存失败");
-           	}
-  		}else{
-  			alert('请输入完整', '../../?action=install&step=2');
-  			jsonError(-1,'请输入完整');
-  		}
-  		break;
+        $title = $_POST['title'];
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $email = $_POST['email'];
+        $domain = $_POST['domain'];
+        
+        if($title && $username && $password && $email && $domain){
+            $update_time = time();
+            $md5_password = md5($password);
+            
+            // 第一个UPDATE语句
+            $update_sql1 = "UPDATE `sdf-config` SET `title` = '{$title}', `url` = 'http://{$domain}/'";
+            $update_result1 = $db->query($update_sql1);
+            
+            // 第二个UPDATE语句
+            $update_sql2 = "UPDATE `sdf-user` SET `username` = '{$username}', `email` = '{$email}', `password` = '{$md5_password}', `update_time` = '{$update_time}'";
+            $update_result2 = $db->query($update_sql2);
+            
+            // 检查两个更新是否都成功
+            if($update_result1 && $update_result2){
+                $_SESSION['install_step'] = 3;
+                jump('../../?action=install&step=3');
+                jsonError(0,'保存成功');
+            }else{
+                alert('保存失败', '../../?action=install&step=2');
+                jsonError(-1,"保存失败");
+            }
+        }else{
+            alert('请输入完整', '../../?action=install&step=2');
+            jsonError(-1,'请输入完整');
+        }
+        break;
   	case '3':
   		$host = $_POST['host'];
   		$username = $_POST['username'];
