@@ -100,7 +100,7 @@ function addAccess()
 	$method = $_SERVER["REQUEST_METHOD"];
 	$ip = $_SERVER["REMOTE_ADDR"];
 	$time = $_SERVER["REQUEST_TIME"];
-	$result = $db->query("INSERT INTO `mxgapi_access`(`id`, `host`, `user_agent`, `protocol`, `method`, `ip`, `time`) VALUES (NULL,'{$host}','{$user_agent}','{$protocol}','{$method}','{$ip}','{$time}');");
+	$result = $db->query("INSERT INTO `sdf-access`(`id`, `host`, `user_agent`, `protocol`, `method`, `ip`, `time`) VALUES (NULL,'{$host}','{$user_agent}','{$protocol}','{$method}','{$ip}','{$time}');");
 	if ($result) {
 		return true;
 	} else {
@@ -198,27 +198,27 @@ function domainAuth($domain)
  * @param int $id 接口id
  * @return bool 添加成功为true，失败则为false
  */
-function addApiAccess($id)
-{
-	require __CONFIG_DIR__ . '/database.php';
-	if (intval($id)) {
-		$get_access = $db->query("SELECT access FROM `mxgapi_api` WHERE `id` = '{$id}';");
-		if ($get_access) {
-			$get_access = $get_access->fetch_assoc();
-			$update_access = $get_access['access'] + 1;
-			$update_result = $db->query("UPDATE `mxgapi_api` SET `access` = '{$update_access}' WHERE `id` = '{$id}';");
-			if ($update_result) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
-}
+// function addApiAccess($id)
+// {
+	// require __CONFIG_DIR__ . '/database.php';
+	// if (intval($id)) {
+		// $get_access = $db->query("SELECT access FROM `mxgapi_api` WHERE `id` = '{$id}';");
+		// if ($get_access) {
+			// $get_access = $get_access->fetch_assoc();
+			// $update_access = $get_access['access'] + 1;
+			// $update_result = $db->query("UPDATE `mxgapi_api` SET `access` = '{$update_access}' WHERE `id` = '{$id}';");
+			// if ($update_result) {
+				// return true;
+			// } else {
+				// return false;
+			// }
+		// } else {
+			// return false;
+		// }
+	// } else {
+		// return false;
+	// }
+// }
 
 /*
  * 获取用户的真实ip
@@ -303,7 +303,7 @@ function is_spider()
 		foreach ($spiderSite as $val) {
 			$str = strtolower($val);
 			if (strpos($agent, $str) !== false) {
-				$sql = "INSERT INTO `mxgapi_spider` (`id`, `agent`, `ip`, `time`) VALUES (NULL, '{$str}', '" . getUserIp() . "', '" . time() . "');";
+				$sql = "INSERT INTO `sdf-spider` (`id`, `agent`, `ip`, `time`) VALUES (NULL, '{$str}', '" . getUserIp() . "', '" . time() . "');";
 				$result = $db->query($sql);
 				if ($result) {
 					return true;
