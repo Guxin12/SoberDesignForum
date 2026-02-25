@@ -139,13 +139,9 @@ if ($db->connect_error) {
         
         if($title && $username && $password && $email && $domain){
             $update_time = time();
-            $md5_password = md5($password);
-            
-            // 第一个UPDATE语句
+            $md5_password = md5($password);           
             $update_sql1 = "UPDATE `sdf-config` SET `title` = '{$title}', `url` = 'http://{$domain}/'";
-            $update_result1 = $db->query($update_sql1);
-            
-            // 第二个UPDATE语句
+            $update_result1 = $db->query($update_sql1);          
             $update_sql2 = "UPDATE `sdf-user` SET `username` = '{$username}', `email` = '{$email}', `password` = '{$md5_password}', `update_time` = '{$update_time}'";
             $update_result2 = $db->query($update_sql2);
             

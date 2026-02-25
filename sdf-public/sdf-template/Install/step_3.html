@@ -2,10 +2,10 @@
 <head>
     <title>第三步 - 配置邮件信息</title>
     <meta charset="utf-8" />
-    <meta name="keywords" content="install,安装,API管理系统" />
-    <meta name="description" content="API管理系统安装页面" />
+    <meta name="keywords" content="install,安装,SDF管理系统" />
+    <meta name="description" content="SDF安装页面" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="./assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
 </head>
 <body>
 <s-page theme="auto">
@@ -13,7 +13,7 @@
         <div slot="headline"> 第三步 - 配置邮件信息 </div>
     </s-appbar>
     
-    <form action="./Core/install.php" method="post" id="installForm">
+    <form action="./sdf-public/sdf-core/install.php" method="post" id="installForm">
         <!-- 隐藏字段用于传递值 -->
         <input type="hidden" name="stphost" id="realhost">
         <input type="hidden" name="stpusername" id="realUser">
@@ -96,9 +96,9 @@ function submitForm() {
 </script>
 
 
-<script src="./assets/js/jquery.min.js"></script>
-<script src="./assets/js/sober.js"></script>
-<script src="./assets/js/vue.js"></script>
+<script src="./sdf-public/sdf-assets/js/jquery.min.js"></script>
+<script src="./sdf-public/sdf-assets/js/sober.js"></script>
+<script src="./sdf-public/sdf-assets/js/vue.js"></script>
 
 </body>
 </html>
