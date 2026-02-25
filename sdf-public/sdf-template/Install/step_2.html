@@ -2,10 +2,10 @@
 <head>
     <title>第二步 - 配置网站信息</title>
     <meta charset="utf-8" />
-    <meta name="keywords" content="install,安装,API管理系统" />
-    <meta name="description" content="API管理系统安装页面" />
+    <meta name="keywords" content="install,安装,SDF管理系统" />
+    <meta name="description" content="SDF安装页面" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="./assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
 </head>
 <body>
 <s-page theme="auto">
@@ -13,7 +13,7 @@
         <div slot="headline"> 第二步 - 配置网站信息 </div>
     </s-appbar>
     
-    <form action="./Core/install.php" method="post" id="installForm">
+    <form action="./sdf-public/sdf-core/install.php" method="post" id="installForm">
         <!-- 隐藏字段用于传递值 -->
         <input type="hidden" name="title" id="realTitle">
         <input type="hidden" name="username" id="realUser">
@@ -23,8 +23,8 @@
         <input type="hidden" name="step" value="2">
 
         <s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
-            <p>很好，STRAPI管理系统已经成功连接了数据库并创建了数据表。</p>
-    	    <p>现在，您需要填写一些信息，无需担心填错，这些信息以后可以再次修改。</p>
+            <p>很好，SoberDesignForum管理系统已经成功连接了数据库并创建了数据表。</p>
+    	    <p>现在，您需要填写一些信息，无需担心填错，这些信息以后可以再次修改。</p>    	    
             <br><br>
             
             <s-text-field 
@@ -32,10 +32,11 @@
                 type="text"
                 data-name="Title"
                 onchange="document.getElementById('realTitle').value = this.value"
+                style="width:100%"
             ></s-text-field>
             
             <s-text-field 
-                label="用户名" 
+                label="管理员用户名" 
                 type="text"
                 data-name="User"
                 onchange="document.getElementById('realUser').value = this.value"
@@ -43,7 +44,7 @@
 
             
             <s-text-field 
-                label="登录密码" 
+                label="管理员登录密码" 
                 type="password"
                 data-name="Pass"
                 onchange="document.getElementById('realPass').value = this.value"
@@ -51,7 +52,7 @@
 
             
             <s-text-field 
-                label="邮箱" 
+                label="管理员邮箱" 
                 type="text"
                 data-name="User"
                 onchange="document.getElementById('realEmail').value = this.value"
@@ -94,9 +95,9 @@ function submitForm() {
 </script>
 
 
-<script src="./assets/js/jquery.min.js"></script>
-<script src="./assets/js/sober.js"></script>
-<script src="./assets/js/vue.js"></script>
+<script src="./sdf-public/sdf-assets/js/jquery.min.js"></script>
+<script src="./sdf-public/sdf-assets/js/sober.js"></script>
+<script src="./sdf-public/sdf-assets/js/vue.js"></script>
 
 </body>
 </html>

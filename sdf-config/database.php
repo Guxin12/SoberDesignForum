@@ -3,7 +3,7 @@
 $host = "localhost";
 $username = "root";
 $password = "123456789";
-$dbname = "root";
+$dbname = "sdf";
 // 创建连接
 @$db = new mysqli($host, $username, $password, $dbname);
 // 检测连接

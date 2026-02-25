@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>第一步 - 安装数据库</title>
+    <title>第二步 - 配置网站信息</title>
     <meta charset="utf-8" />
     <meta name="keywords" content="install,安装,SDF管理系统" />
     <meta name="description" content="SDF安装页面" />
@@ -10,60 +10,60 @@
 <body>
 <s-page theme="auto">
     <s-appbar>
-        <div slot="headline"> 第一步 - 安装数据库 </div>
+        <div slot="headline"> 第二步 - 配置网站信息 </div>
     </s-appbar>
     
     <form action="./sdf-public/sdf-core/install.php" method="post" id="installForm">
         <!-- 隐藏字段用于传递值 -->
-        <input type="hidden" name="host" id="realHost" value="localhost">
-        <input type="hidden" name="port" id="realPort" value="3306">
-        <input type="hidden" name="name" id="realDbname">
-        <input type="hidden" name="username" id="realUsername">
-        <input type="hidden" name="password" id="realPassword">
-        <input type="hidden" name="step" value="1">
+        <input type="hidden" name="title" id="realTitle">
+        <input type="hidden" name="username" id="realUser">
+        <input type="hidden" name="password" id="realPass">
+        <input type="hidden" name="email" id="realEmail">
+        <input type="hidden" name="domain" id="realDomain">
+        <input type="hidden" name="step" value="2">
 
         <s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
-            请在下方填写你的数据库连接信息
+            <p>很好，SoberDesignForum管理系统已经成功连接了数据库并创建了数据表。</p>
+    	    <p>现在，您需要填写一些信息，无需担心填错，这些信息以后可以再次修改。</p>    	    
             <br><br>
             
             <s-text-field 
-                label="数据库地址" 
+                label="站点标题" 
                 type="text"
-                data-name="Host"
-                value="localhost"
-                onchange="document.getElementById('realHost').value = this.value"
+                data-name="Title"
+                onchange="document.getElementById('realTitle').value = this.value"
+                style="width:100%"
             ></s-text-field>
             
             <s-text-field 
-                label="数据库端口" 
+                label="管理员用户名" 
                 type="text"
-                data-name="Port"
-                value="3306"
-                onchange="document.getElementById('realPort').value = this.value"
-            ></s-text-field>
-
-            
-            <s-text-field 
-                label="数据库名" 
-                type="text"
-                data-name="Dbname"
-                onchange="document.getElementById('realDbname').value = this.value"
+                data-name="User"
+                onchange="document.getElementById('realUser').value = this.value"
             ></s-text-field>
 
             
             <s-text-field 
-                label="数据库用户名" 
-                type="text"
-                data-name="Username"
-                onchange="document.getElementById('realUsername').value = this.value"
-            ></s-text-field>
-
-            
-            <s-text-field 
-                label="数据库密码" 
+                label="管理员登录密码" 
                 type="password"
-                data-name="Password"
-                onchange="document.getElementById('realPassword').value = this.value"
+                data-name="Pass"
+                onchange="document.getElementById('realPass').value = this.value"
+            ></s-text-field>
+
+            
+            <s-text-field 
+                label="邮箱" 
+                type="text"
+                data-name="User"
+                onchange="document.getElementById('realEmail').value = this.value"
+            ></s-text-field>
+
+            
+            <s-text-field 
+                label="您的域名" 
+                type="text"
+                data-name="Pass"
+                onchange="document.getElementById('realDomain').value = this.value"
             ></s-text-field>
 
 
