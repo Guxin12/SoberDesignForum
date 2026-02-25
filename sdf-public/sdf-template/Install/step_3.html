@@ -19,7 +19,7 @@
         <input type="hidden" name="stpusername" id="realUser">
         <input type="hidden" name="stppassword" id="realPass">
         <input type="hidden" name="stpport" id="realPort">
-        <input type="hidden" name="stpsecure" id="realsecure">        
+        <input type="hidden" name="stpsecure" id="realsecure" value="">        
         <input type="hidden" name="step" value="3">
         
         <s-card style="display: block; height: none; max-width: none; margin : 10px;padding: 24px">
@@ -56,18 +56,12 @@
                 data-name="Port"
                 onchange="document.getElementById('realPort').value = this.value"
             ></s-text-field>
-            <br>
-            如果你不知道你的加密类型这里通常有两种 ssl和tls
-            <br>
-            <s-text-field 
-                label="SMTP 加密类型" 
-                type="text"
-                data-name="secure"
-                onchange="document.getElementById('realsecure').value = this.value"
-            ></s-text-field>
-            
-
-    
+            <br>            
+            <s-picker label="加密类型" id="securePicker" style="width:100%" onchange="updateSecureType(this.value)">
+              <s-picker-item value="ssl">SSL</s-picker-item>
+              <s-picker-item value="tls">TLS</s-picker-item>
+            </s-picker>
+            <br><br>
             <s-button 
                 type="filled"
                 onclick="submitForm()"
@@ -78,8 +72,11 @@
 </s-page>
 
 <script>
+function updateSecureType(value) {
+    document.getElementById('realsecure').value = value;
+}
+
 function submitForm() {
-  // 确保所有字段都有值
   let valid = true;
   document.querySelectorAll('s-text-field').forEach(field => {
     if(!field.value) {
@@ -87,13 +84,49 @@ function submitForm() {
     }
   });
   
+  const secureValue = document.getElementById('realsecure').value;
+  
+  if(!secureValue) {
+    valid = false;
+  }
+  
   if(valid) {
     document.getElementById('installForm').submit();
   } else {
     alert("请填写所有字段");
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const securePicker = document.getElementById('securePicker');
+    if(securePicker) {
+        securePicker.addEventListener('input', function(e) {
+            updateSecureType(e.target.value);
+        });
+        
+        securePicker.addEventListener('change', function(e) {
+            updateSecureType(e.target.value);
+        });
+        
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                    const newValue = securePicker.getAttribute('value');
+                    if(newValue) {
+                        updateSecureType(newValue);
+                    }
+                }
+            });
+        });
+        
+        observer.observe(securePicker, { 
+            attributes: true, 
+            attributeFilter: ['value', 'data-value'] 
+        });
+    }
+});
 </script>
+
 
 
 <script src="./sdf-public/sdf-assets/js/jquery.min.js"></script>

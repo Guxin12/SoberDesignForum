@@ -1,16 +1,16 @@
 <?php
 session_start();
 $_SESSION['install_step'] = 1;
-file_put_contents('./Core/chece/install.lock', true);
+file_put_contents('./sdf-config/install.lock', true);
 ?>
 <html>
 <head>
     <title>安装完成！</title>
     <meta charset="utf-8" />
-    <meta name="keywords" content="install,安装,API管理系统" />
-    <meta name="description" content="API管理系统安装页面" />
+    <meta name="keywords" content="install,安装,SDF管理系统" />
+    <meta name="description" content="SDF安装页面" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="./assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
 </head>
 <body>
 <s-page theme="auto">
@@ -27,8 +27,8 @@ file_put_contents('./Core/chece/install.lock', true);
 </s-card>
 
 </s-page>
-<script src="./assets/js/jquery.min.js"></script>
-<script src="./assets/js/sober.js"></script>
-<script src="./assets/js/vue.js"></script>
+<script src="./sdf-public/sdf-assets/js/jquery.min.js"></script>
+<script src="./sdf-public/sdf-assets/js/sober.js"></script>
+<script src="./sdf-public/sdf-assets/js/vue.js"></script>
 </body>
 </html>

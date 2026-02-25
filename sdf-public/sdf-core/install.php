@@ -160,12 +160,12 @@ if ($db->connect_error) {
         }
         break;
   	case '3':
-  		$host = $_POST['host'];
-  		$username = $_POST['username'];
-  		$password = $_POST['password'];
-  		$port = $_POST['port'];
-  		$secure = $_POST['secure'];
-  		if($host && $username && $password && $port){
+  		$host = $_POST['stphost'];
+  		$username = $_POST['stpusername'];
+  		$password = $_POST['stppassword'];
+  		$port = $_POST['stpport'];
+  		$secure = $_POST['stpsecure'];
+  		if($host && $username && $password && $port && $secure){
   			$update_sql = "UPDATE `sdf-config` SET `smtp_host`='{$host}',`smtp_username`='{$username}',`smtp_password`='{$password}',`smtp_port`='{$port}',`smtp_secure`='{$secure}';";
   			$update_result = $db->query($update_sql);
   			if($update_result){

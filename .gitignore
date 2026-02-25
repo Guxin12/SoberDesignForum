@@ -6,3 +6,4 @@
 
 # 忽略.bak
 *.bak
+*.lock
