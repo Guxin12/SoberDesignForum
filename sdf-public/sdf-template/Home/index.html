@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        首页 - <?php echo $config['title'];?>
+    </title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="<?php echo $config['keywords'];?>" />
+    <meta name="description" content="<?php echo $config['description'];?>" />
+    <link rel="icon" href="<?php echo $config['favicon'];?>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/index.css"/>
+</head>
+
+<?php require "header.html";?>
+
+    <main class="main1">
+        <div class="container">
+            <h2>以 <span id="Typewriter"></span> 的方式<br>
+                 享受交流
+            </h2>
+            <s-button type="text" style="display: flex;"> 
+                <span>推荐话题</span>
+                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+            </s-button>
+            
+            
+            
+            
+            
+        </div>                                
+    </main>
+
+
+<?php require "footer.html";?>
+<script src="./sdf-public/sdf-assets/js/typed.umd.js"></script>
+<script>
+var Typewriter = new Typed('#Typewriter', { strings: ['Vue为核心','SoberDesign','更优雅','跨平台','动态响应性','无限距离'], typeSpeed: 26, backSpeed: 26, smartBackspace: true, loop: true });       
+</script>
+</body>
+</html>
