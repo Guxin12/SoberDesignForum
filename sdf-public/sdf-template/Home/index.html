@@ -17,20 +17,34 @@
 <?php require "header.html";?>
 
     <main class="main1">
-        <div class="container">
-            <h2>以 <span id="Typewriter"></span> 的方式<br>
-                 享受交流
-            </h2>
-            <s-button type="text" style="display: flex;"> 
-                <span>推荐话题</span>
-                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
-            </s-button>
-            
-            
-            
-            
-            
-        </div>                                
+    	<div class="main1_1">
+    		<div class="container ele" id="page-index">
+    			<h2 style="padding:0 16px 0 16px;">
+    			    以 <span id="Typewriter"></span> 的方式
+    			    <br> 享受交流 
+			    </h2>
+    			<s-button type="text" style="margin:0 16px 5px 16px;display: flex;" href="?action=topics">
+    				<span>推荐话题</span>
+    				<s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+    			</s-button>
+	    			<div class="topics-wrapper">
+                        <div class="topics">
+                        
+                            <div class="mc-topic-item item-inner">
+                                <s-card clickable="true" class="item">
+                                  <div slot="image"></div>
+                                  <div slot="headline">Headline</div>
+                                  <s-button slot="action" type="filled-tonal">Action</s-button>
+                                  <s-button slot="action">Action</s-button>
+                                </s-card>
+                            </div>                            
+
+                            
+                        </div>
+    			     </div>
+
+    		</div>
+    	</div>
     </main>
 
 
@@ -39,5 +53,6 @@
 <script>
 var Typewriter = new Typed('#Typewriter', { strings: ['Vue为核心','SoberDesign','更优雅','跨平台','动态响应性','无限距离'], typeSpeed: 26, backSpeed: 26, smartBackspace: true, loop: true });       
 </script>
+
 </body>
 </html>

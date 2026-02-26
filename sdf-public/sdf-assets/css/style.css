@@ -42,6 +42,102 @@ body {
     overscroll-behavior: none;
 }
 
+s-scroll-view.main {
+    padding-top: 64px;
+    /* 为应用栏预留空间*/
+    height: calc(100% - 64px);
+    /* 确保内容不会溢出*/
+    box-sizing: border-box;
+}
+
+#installForm s-text-field{
+    width:100%;
+}
+
+
+/*以下是一键向上fab按钮的css*/
+
+
+
+/* 固定到右下角的 FAB 按钮 */
+.sober-fab-fixed {
+  position: fixed !important;
+  /* 手机平板上距离屏幕右下角 16px */
+  right: 16px;
+  bottom: 16px;
+}
+
+@media (min-width: 1024px) {
+  .sober-fab-fixed {
+    /* 电脑上距离屏幕右下角 24px */
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+.sober-fab-extended {
+	border-radius:24px
+}
+
+.sober-fab-extended span {
+	float:right;
+	margin-left:20px;
+	font-size:14px
+}
+
+@media (max-width:599.9px) {
+	.sober-fab-extended span {
+	    display:none
+   }
+}
+
+/* 添加FAB按钮的过渡动画*/
+#backToTopFab {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* 隐藏状态*/
+#backToTopFab.hidden {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 悬停效果*/
+#backToTopFab:hover {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* 激活状态*/
+#backToTopFab:active {
+    box-shadow: 0 7px 8px -4px rgba(0, 0, 0, 0.2), 0 12px 17px 2px rgba(0, 0, 0, 0.14), 0 5px 22px 4px rgba(0, 0, 0, 0.12);
+}
+
+
+
+/*以上是一键向上fab按钮的css*/
+
+/*调整颜色类css*/
+
+s-picker-item::part(text) {
+    display: flex;
+    justify-content: center;
+}
+
+s-picker::part(container) {
+    border-radius: 12px;
+    min-width: 75px;
+}
+
+/*以上调整颜色类css*/
+
+
+
+
+
+
 .list {
     max-width: 1280px;
     margin: auto;
@@ -69,41 +165,11 @@ body {
     margin-bottom: 24px;
 }
 
-s-scroll-view.main {
-    padding-top: 64px;
-    /* 为应用栏预留空间*/
-    height: calc(100% - 64px);
-    /* 确保内容不会溢出*/
-    box-sizing: border-box;
-}
 .card1 {
     display: block;
     max-width: none;
 }
 
-/* 添加FAB按钮的过渡动画*/
-#backToTopFab {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: scale(1);
-    opacity: 1;
-}
-
-/* 隐藏状态*/
-#backToTopFab.hidden {
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* 悬停效果*/
-#backToTopFab:hover {
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-
-/* 激活状态*/
-#backToTopFab:active {
-    box-shadow: 0 7px 8px -4px rgba(0, 0, 0, 0.2), 0 12px 17px 2px rgba(0, 0, 0, 0.14), 0 5px 22px 4px rgba(0, 0, 0, 0.12);
-}
 
 .tagmar {
     margin-right:0px;
@@ -123,37 +189,7 @@ s-scroll-view.main {
 	border-radius:20px;
 }
 
-.sober-fab-extended {
-	border-radius:24px
-}
-
-.sober-fab-extended span {
-	float:right;
-	margin-left:20px;
-	font-size:14px
-}
-
-@media (max-width:599.9px) {
-	.sober-fab-extended span {
-	    display:none
-   }
-}
-
-
-s-picker-item::part(text) {
-    display: flex;
-    justify-content: center;
-}
-
-s-picker::part(container) {
-    border-radius: 12px;
-    min-width: 75px;
-}
-
 .el-tag{
     border-radius: 8px;
 }
 
-#installForm s-text-field{
-    width:100%;
-}
