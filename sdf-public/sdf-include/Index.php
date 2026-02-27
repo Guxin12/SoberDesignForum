@@ -27,9 +27,13 @@ if($config['fire_wall'] == '1' && $action != 'admin'){
 // 行为与文件名的映射关系
 $actionMap = [
     'topics' => 'Topics.php',
+    'onetopic' => 'OneTopic.php',
     'questions' => 'Questions.php',
-    'users' => 'Users.php',    
+    'onequestion' => 'OneQuestion.php',
     'articles'         => 'Articles.php',
+    'onearticle'         => 'OneArticle.php',
+    'users' => 'Users.php',
+    'oneuser' => 'OneUser.php',
     'notifications' => 'Notifications',
     'friendlinks' => 'Friendlinks.php',
     'about'       => 'About.php',

@@ -25,6 +25,7 @@ function jsonError($code, $msg)
  */
 function json($code, $msg, $data)
 {
+    header('Content-Type: application/json; charset=utf-8');
 	die(json_encode(array(
 		'code' => $code,
 		'msg' => $msg,
