@@ -9,17 +9,17 @@ var radioButtons = document.querySelectorAll('s-radio-button[name="theme"]');
 if (localStorage.getItem('colour')) {
     colour(localStorage.getItem('colour'));
 } else {
-    colour("#9c4142");
+    colour("#006EFF");
 }
 
 function colour(color) {
     if (!/^#/.test(color)) {
-        sober.theme.createScheme('#9c4142', { page: document.querySelector('s-page') });
-        localStorage.setItem('colour', '#9c4142');
+        sober.theme.createScheme('#006EFF', { page: document.querySelector('s-page') });
+        localStorage.setItem('colour', '#006EFF');
         // 同时更新savedHue
-        const hue = hexToHue('#9c4142');
+        const hue = hexToHue('#006EFF');
         localStorage.setItem('savedHue', hue);
-        localStorage.setItem('savedHex', '#9c4142');
+        localStorage.setItem('savedHex', '#006EFF');
     } else {
         sober.theme.createScheme(color, { page: document.querySelector('s-page') });
         localStorage.setItem('colour', color);

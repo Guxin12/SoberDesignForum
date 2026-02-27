@@ -1793,6 +1793,85 @@
             }
         }) {};
     ke.define(or), Ee.define(ir);
+    var xyz = "s-list-item",
+        abc = g({
+            folded: !0,
+            href: ""  // 添加 href 属性
+        }),
+        def = `:host{display:flex;flex-direction:column;border-top: solid 1px var(--s-color-outline-variant, #C0C8CC);;color:var(--s-color-on-surface, #191C1E)}
+        .container{display:flex;align-items:center;height:70px;padding:0 20px;flex-shrink:0}
+        .text{flex-grow:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .toggle-icon{width:24px;height:24px;display:none;margin-right:-8px;margin-left:12px;transform:rotate(-90deg);transition:transform var(--s-motion-duration-short4, .2s) var(--s-motion-easing-standard, cubic-bezier(.2, 0, 0, 1));fill:var(--s-color-on-surface-variant, #40484C)}
+        .show-menu .toggle-icon{display:block}
+        :host([folded=false]) .toggle-icon{transform:rotate(0)}
+        .fold{flex-shrink:0}
+        .show-menu+.fold{margin:0 -8px 0 0}
+        .menu{display:block;padding-top:8px}
+        ::slotted(:is(svg,s-icon)){color:var(--s-color-on-surface-variant, #40484C);fill:currentColor;height:24px;width:24px}
+        ::slotted([slot]){flex-shrink:0}
+        ::slotted([slot=start]){margin-left:-4px;margin-right:12px}
+        ::slotted([slot=end]){margin-right:-8px;margin-left:12px}
+        ::slotted([slot=menu]){background:var(--s-color-surface-container-high, #E7E8EA)}
+        /* 添加链接样式 */
+        a { 
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            height: 100%;
+        }`,
+        ghi = `<s-ripple class="container" part="container">
+            <slot name="start"></slot>
+            <div class="text" part="text">
+                <a href="{{href}}" part="link">
+                    <slot></slot>
+                </a>
+            </div>
+            <slot name="end">
+                <svg viewBox="0 -960 960 960" class="toggle-icon">
+                    <path d="M480-360 280-560h400L480-360Z"></path>
+                </svg>
+            </slot>
+        </s-ripple>
+        <s-fold class="fold" part="fold" folded="${abc.folded}">
+            <slot name="menu" class="menu"></slot>
+        </s-fold>`,
+        jkl = class extends h({
+            style: def,
+            template: ghi,
+            props: abc,
+            setup(t) {
+                let e = t.querySelector(".container"),
+                    r = t.querySelector(".fold"),
+                    a = t.querySelector("slot[name=menu]"),
+                    link = t.querySelector("a");  // 获取链接元素
+                
+                // 处理链接点击
+                if (link) {
+                    link.onclick = (event) => {
+                        if (this.href) {
+                            event.preventDefault();
+                            window.location.href = this.href;
+                            // 关闭菜单，触发自定义事件（事件名与组件名一致）
+                            this.dispatchEvent(new Event(`${xyz}:click`, {
+                                bubbles: !0
+                            }));
+                        }
+                    };
+                }
+                
+                r.onclick = i => i.stopPropagation();
+                a.onslotchange = () => e.classList[a.assignedElements().length > 0 ? "add" : "remove"]("show-menu");
+                e.onclick = () => {
+                    e.classList.contains("show-menu") && (this.folded = !this.folded)
+                };
+                return {
+                    folded: i => r.folded = i
+                }
+            }
+        }) {};
+    jkl.define(xyz);
     var Ue = "s-navigation",
         lr = g({
             mode: ["bottom", "rail"],

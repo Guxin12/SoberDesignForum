@@ -57,8 +57,6 @@ s-scroll-view.main {
 
 /*以下是一键向上fab按钮的css*/
 
-
-
 /* 固定到右下角的 FAB 按钮 */
 .sober-fab-fixed {
   position: fixed !important;

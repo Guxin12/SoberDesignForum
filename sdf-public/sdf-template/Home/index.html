@@ -16,33 +16,90 @@
 
 <?php require "header.html";?>
 
-    <main class="main1">
+    <main class="main1" data-booted=true>
     	<div class="main1_1">
-    		<div class="container ele" id="page-index">
-    			<h2 style="padding:0 16px 0 16px;">
+    		<div class="container" id="page-index">
+    			<h2 style="padding:0 15px 0 15px;">
     			    以 <span id="Typewriter"></span> 的方式
     			    <br> 享受交流 
 			    </h2>
-    			<s-button type="text" style="margin:0 16px 5px 16px;display: flex;" href="?action=topics">
+    			<s-button type="text" style="margin:0 15px 5px 15px;display: flex;" href="?action=topics">
     				<span>推荐话题</span>
     				<s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
     			</s-button>
-	    			<div class="topics-wrapper">
-                        <div class="topics">
-                        
-                            <div class="mc-topic-item item-inner">
-                                <s-card clickable="true" class="item">
-                                  <div slot="image"></div>
-                                  <div slot="headline">Headline</div>
-                                  <s-button slot="action" type="filled-tonal">Action</s-button>
-                                  <s-button slot="action">Action</s-button>
-                                </s-card>
-                            </div>                            
+    			<div class="topics-section">	    			    			
+                   <s-card type="outlined" style="width: 100%;max-width: 100%;">
+                        <div slot="image"></div>
+                        <div slot="headline">雪山木屋</div>
+                        <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;"><s-icon name="star"></s-icon>
+                        </s-icon-button>
+                        <s-button type="text" style="float:right;margin:3px 10px 10px 0;">3 人关注</s-button>
+                   </s-card>	                                
+    			</div>    			    
+		        <div class="items-section">
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+            				<span>最新提问</span>
+            				<s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+    			        </s-button>
+    			
+						<s-list-item href="/">
+                            <span slot="start" style="background: var(--s-color-primary, #006782); color: white; width: 47px; height: 47px; border-radius: 50%; display: flex; align-items: center; justify-content: center;font-size: 30px;">
+                                U
+                            </span>
+                           
+                            <div style="display: flex; flex-direction: column; margin-left: 5px;">
+                                <span style="font-size: 17px;margin-bottom:2px;">这个主题在哪里下载</span>
+                                <span style="font-size: 13px;">在这里</span>
+                            </div>
+                        </s-list-item>
+                    </s-card>
+         
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+				            <span>近期热门提问</span>
+			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+			            </s-button>
+                    </s-card>
+                </div>
+        
+                <div class="items-section">
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+				            <span>近期文章</span>
+			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+			            </s-button>
+                    </s-card>
+            
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+				            <span>近期热门文章</span>
+			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+			            </s-button>
+                    </s-card>
+                </div>
+                    
+                <div class="items-section">
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+				            <span>新加入的人</span>
+			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+			            </s-button>
+                    </s-card>
+            
+                    <s-card type="outlined">
+                        <s-button type="text" style="display: flex;" href="?action=topics">
+				            <span>最受欢迎的人</span>
+			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
+			            </s-button>
+                    </s-card>
+                </div>  
+                
 
-                            
-                        </div>
-    			     </div>
-
+                              
+                                                        
+          
+                                                                                                      
     		</div>
     	</div>
     </main>
@@ -51,7 +108,165 @@
 <?php require "footer.html";?>
 <script src="./sdf-public/sdf-assets/js/typed.umd.js"></script>
 <script>
-var Typewriter = new Typed('#Typewriter', { strings: ['Vue为核心','SoberDesign','更优雅','跨平台','动态响应性','无限距离'], typeSpeed: 26, backSpeed: 26, smartBackspace: true, loop: true });       
+(function() {
+    // 等待DOM加载完成
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+        initCarousel();
+    }
+
+    function initCarousel() {
+        const container = document.querySelector('#page-index .topics-section');
+        if (!container) return;
+
+        // 获取所有直接子元素中的 s-card
+        const cards = Array.from(container.children).filter(el => el.tagName === 'S-CARD');
+        if (cards.length === 0) return;
+
+        // --- 构建轮播DOM结构 (不破坏原有容器) ---
+        // 清空容器，但保留容器本身
+        container.innerHTML = '';
+
+        // 创建视口 div
+        const viewport = document.createElement('div');
+        viewport.className = 'carousel-viewport';
+
+        // 创建轨道 div
+        const track = document.createElement('div');
+        track.className = 'carousel-track';
+
+        // 将每个卡片包裹为 slide，并添加索引类用于背景区分
+        cards.forEach((card, idx) => {
+            const slide = document.createElement('div');
+            slide.className = `carousel-slide slide-${idx}`;
+            slide.appendChild(card);  // 移动原卡片到 slide 内
+            track.appendChild(slide);
+        });
+
+        viewport.appendChild(track);
+        container.appendChild(viewport);
+
+        // --- 轮播状态变量 ---
+        const slides = document.querySelectorAll('#page-index .topics-section .carousel-slide');
+        const slideCount = slides.length;
+        let index = 0;                 // 当前显示卡片的索引
+        let startX = 0;                // 拖拽起始X坐标
+        let dragOffset = 0;            // 当前拖拽偏移量（像素）
+        let isDragging = false;        // 是否正在拖拽
+        let timer = null;              // 自动轮播定时器
+        const threshold = 0.3;         // 切换阈值（卡片宽度的30%）
+
+        // --- 辅助函数：更新轨道位置 ---
+        const updatePosition = (offset = 0) => {
+            const basePercent = -index * 100;
+            if (offset && viewport.clientWidth) {
+                const offsetPercent = (offset / viewport.clientWidth) * 100;
+                track.style.transform = `translateX(${basePercent + offsetPercent}%)`;
+            } else {
+                track.style.transform = `translateX(${basePercent}%)`;
+            }
+        };
+
+        // --- 切换到指定索引（带动画）---
+        const goTo = (newIndex) => {
+            if (newIndex < 0 || newIndex >= slideCount) return;
+            index = newIndex;
+            track.classList.remove('dragging');
+            updatePosition(0);
+        };
+
+        // --- 自动轮播控制 ---
+        const stopAuto = () => { clearInterval(timer); timer = null; };
+        const startAuto = () => {
+            stopAuto();
+            timer = setInterval(() => {
+                if (!isDragging && !container.matches(':hover')) {
+                    // 循环播放：最后一张后回到第一张
+                    goTo(index === slideCount - 1 ? 0 : index + 1);
+                }
+            }, 3500);
+        };
+
+        // --- 拖拽事件 ---
+        const onStart = (e) => {
+            e.preventDefault();
+            startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            isDragging = true;
+            track.classList.add('dragging');
+            stopAuto();
+            dragOffset = 0;
+            updatePosition(0);
+        };
+
+        const onMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            let delta = clientX - startX; // 正数：向右拖拽（显示前一张），负数：向左拖拽（显示后一张）
+
+            // 边界限制：第一张不能向右拖，最后一张不能向左拖
+            if ((index === 0 && delta > 0) || (index === slideCount - 1 && delta < 0)) {
+                delta = 0;
+            }
+
+            // 限制最大偏移量（不超过卡片宽度的80%）
+            const maxDrag = viewport.clientWidth * 0.8;
+            if (Math.abs(delta) > maxDrag) {
+                delta = delta > 0 ? maxDrag : -maxDrag;
+            }
+
+            dragOffset = delta;
+            updatePosition(dragOffset);
+        };
+
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.classList.remove('dragging');
+
+            if (Math.abs(dragOffset) > viewport.clientWidth * threshold) {
+                if (dragOffset > 0 && index > 0) {
+                    goTo(index - 1);      // 向右拖拽，上一张
+                } else if (dragOffset < 0 && index < slideCount - 1) {
+                    goTo(index + 1);      // 向左拖拽，下一张
+                } else {
+                    updatePosition(0);    // 边界回弹
+                }
+            } else {
+                updatePosition(0);       // 未超过阈值回弹
+            }
+
+            dragOffset = 0;
+            if (!container.matches(':hover')) startAuto();
+        };
+
+        // --- 事件监听 ---
+        viewport.addEventListener('touchstart', onStart, { passive: false });
+        viewport.addEventListener('touchmove', onMove, { passive: false });
+        viewport.addEventListener('touchend', onEnd);
+        viewport.addEventListener('touchcancel', onEnd);
+
+        viewport.addEventListener('mousedown', onStart);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onEnd);
+        viewport.addEventListener('mouseleave', (e) => isDragging && onEnd());
+
+        // 悬停暂停/恢复自动播放
+        container.addEventListener('mouseenter', stopAuto);
+        container.addEventListener('mouseleave', () => !isDragging && startAuto());
+
+        // 初始化
+        updatePosition(0);
+        startAuto();
+
+        // 窗口大小变化时重新校正位置
+        window.addEventListener('resize', () => updatePosition(0));
+    }
+})();
+</script>
+<script>
+var Typewriter = new Typed('#Typewriter', { strings: ['Vue为核心','SoberDesign','更优雅','跨平台','动态响应性','无限距离'], typeSpeed: 100, backSpeed: 30, smartBackspace: true, loop: true });       
 </script>
 
 </body>
