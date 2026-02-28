@@ -29,24 +29,42 @@
     				<s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
     			</s-button>    			
                 <div id="topiclb">
-                    <div class="topics-section">
-                        <div class="carousel-viewport" ref="viewport">
-                            <div class="carousel-track" ref="track" :style="{ transform: `translateX(${offset}%)` }">
-                                <div v-for="(topic, idx) in topics" :key="topic.topic_id" class="carousel-slide">
-                                    <s-card type="outlined" style="width: 100%; max-width: 100%;">
-                                        <div slot="image"></div>
-                                        <div slot="headline" style="margin-top:15px;">{{ topic.name }}</div>
-                                        <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;">
-                                            <s-icon name="star"></s-icon>
-                                        </s-icon-button>
-                                        <s-button type="text" style="float:right;margin:3px 10px 10px 0;">
-                                            {{ topic.follower_count || 0 }} 人关注
-                                        </s-button>
-                                    </s-card>
-                                </div>
-                            </div>
+                  <div class="topics-section">
+                    <div class="carousel-viewport" ref="viewport">
+                      <div class="carousel-track" ref="track" :style="{ transform: `translateX(${offset}%)` }">
+                        <div v-for="(topic, idx) in topics" :key="topic.topic_id" class="carousel-slide">
+                          <s-card type="outlined" style="width: 100%; max-width: 100%;" :href="`?action=onetopic&topic_id=${topic.topic_id}`">
+                            <div slot="image"></div>
+                            <div slot="headline" style="margin-top:15px;">{{ topic.name }}</div>
+                            <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;">
+                              <s-icon name="star"></s-icon>
+                            </s-icon-button>
+                            <s-button type="text" @click="showFollowers(topic)" style="float:right;margin:3px 10px 10px 0;">
+                              {{ getFollowerCount(topic) }} 人关注
+                            </s-button>
+                          </s-card>
                         </div>
+                      </div>
                     </div>
+                  </div>
+                  <s-dialog :size="isMobile ? 'full' : undefined" :showed="dialogVisible" @update:showed="dialogVisible = $event" id="fankDialog">
+                	<div slot="headline" style="margin-bottom: 22px;"> {{ currentTopic ? currentTopic.name : '话题' }}的关注者 </div>
+                	<div v-if="currentFollowers.length === 0" style="padding: 10px; text-align: center;"> <s-empty>暂时没有人关注 {{ currentTopic ? currentTopic.name : '话题' }} </s-empty> </div>
+                <div v-for="follower in currentFollowers" :key="follower.user_id">
+                	<s-list-item href="/" style="width:100%;max-width:100%">
+                            <div slot="start">
+                                <span v-if="!follower.avatar" :style="{ background: follower['avatar-color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
+                                    {{ follower.username.charAt(0) }}
+                                </span>
+                                <img v-else :src="follower.avatar" style="display: flex;width: 47px; height: 47px;border-radius: 50%;align-items: center; justify-content: center;">
+                            </div>                
+                            <div style="display: flex; flex-direction: column; margin-left: 5px;">
+                                <span style="font-size: 17px;margin-bottom:2px;">{{ follower.username }}</span>
+                            </div>
+                        </s-list-item>
+                </div>
+                		<s-button slot="action" style="display: flex;" type="text" @click="closeDialog">确定</s-button>
+                  </s-dialog>
                 </div>
 		        <div class="items-section">
                     <s-card type="outlined">
@@ -105,13 +123,7 @@
 			                <s-icon style="margin-left: auto;" slot="end" name="arrow_forward"></s-icon>
 			            </s-button>
                     </s-card>
-                </div>  
-                
-
-                              
-                                                        
-          
-                                                                                                      
+                </div>                
     		</div>
     	</div>
     </main>
@@ -120,205 +132,163 @@
 <?php require "footer.html";?>
 <script src="./sdf-public/sdf-assets/js/typed.umd.js"></script>
 <script>
-const { createApp, ref, onMounted, onUnmounted, nextTick } = Vue;
+const { createApp } = Vue;
 
-const topiclb = createApp({
-    setup() {
-        const topics = ref([]);
-        const viewport = ref(null);
-        const track = ref(null);
-        const offset = ref(0);
+const appData = {
+  data() {
+    return {
+      topics: [],
+      followersMap: {},
+      offset: 0,
+      currentIndex: 0,
+      slideCount: 0,
+      autoTimer: null,
+      viewport: null,
+      track: null,
+      dialogVisible: false,
+      currentTopic: null,
+      isMobile: window.innerWidth <= 600 // 新增：移动端检测
+    };
+  },
 
-        // 轮播状态
-        let currentIndex = 0;
-        let slideCount = 0;
-        let startX = 0;
-        let dragOffset = 0;
-        let isDragging = false;
-        let autoTimer = null;
-        const threshold = 0.3;
-
-        // 更新轨道位置（响应式 offset）
-        const updatePosition = (dragOffsetPx = 0) => {
-            if (!viewport.value) return;
-            const basePercent = -currentIndex * 100;
-            if (dragOffsetPx && viewport.value.clientWidth) {
-                const percent = (dragOffsetPx / viewport.value.clientWidth) * 100;
-                offset.value = basePercent + percent;
-            } else {
-                offset.value = basePercent;
-            }
-        };
-
-        // 切换到指定索引（带动画）
-        const goTo = (newIndex) => {
-            if (newIndex < 0 || newIndex >= slideCount) return;
-            currentIndex = newIndex;
-            track.value?.classList.remove('dragging');
-            updatePosition();
-        };
-
-        // 自动轮播控制
-        const stopAuto = () => {
-            if (autoTimer) {
-                clearInterval(autoTimer);
-                autoTimer = null;
-            }
-        };
-        const startAuto = () => {
-            stopAuto();
-            if (slideCount <= 1) return;
-            autoTimer = setInterval(() => {
-                // 只在没有拖拽且鼠标不在轮播区域时切换
-                if (!isDragging && !viewport.value?.closest('.topics-section')?.matches(':hover')) {
-                    const next = currentIndex === slideCount - 1 ? 0 : currentIndex + 1;
-                    goTo(next);
-                }
-            }, 3500);
-        };
-
-        // 拖拽事件
-        const onDragStart = (e) => {
-            e.preventDefault();
-            startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-            isDragging = true;
-            track.value?.classList.add('dragging');
-            stopAuto();               // 拖拽时暂停自动轮播
-            dragOffset = 0;
-            updatePosition();
-        };
-
-        const onDragMove = (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-            let delta = clientX - startX;
-
-            // 边界限制：第一张不能向右拖，最后一张不能向左拖
-            if ((currentIndex === 0 && delta > 0) || (currentIndex === slideCount - 1 && delta < 0)) {
-                delta = 0;
-            }
-
-            const maxDrag = viewport.value?.clientWidth * 0.8 || 0;
-            if (Math.abs(delta) > maxDrag) {
-                delta = delta > 0 ? maxDrag : -maxDrag;
-            }
-
-            dragOffset = delta;
-            updatePosition(dragOffset);
-        };
-
-        const onDragEnd = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            track.value?.classList.remove('dragging');
-
-            const viewportWidth = viewport.value?.clientWidth || 0;
-            if (Math.abs(dragOffset) > viewportWidth * threshold) {
-                if (dragOffset > 0 && currentIndex > 0) {
-                    goTo(currentIndex - 1);      // 向右拖，显示上一张
-                } else if (dragOffset < 0 && currentIndex < slideCount - 1) {
-                    goTo(currentIndex + 1);      // 向左拖，显示下一张
-                } else {
-                    updatePosition();             // 边界回弹
-                }
-            } else {
-                updatePosition();                  // 未超过阈值回弹
-            }
-
-            dragOffset = 0;
-            // 拖拽结束后，如果鼠标不在轮播区域，则恢复自动轮播
-            if (!viewport.value?.closest('.topics-section')?.matches(':hover')) {
-                startAuto();
-            }
-        };
-
-        // 初始化轮播：绑定事件
-        const initCarousel = () => {
-            if (!viewport.value || !track.value) return;
-            const slides = track.value.children;
-            slideCount = slides.length;
-            if (slideCount === 0) return;
-
-            // 重置索引
-            currentIndex = 0;
-            updatePosition();
-
-            // 绑定触摸/鼠标事件
-            viewport.value.addEventListener('touchstart', onDragStart, { passive: false });
-            viewport.value.addEventListener('touchmove', onDragMove, { passive: false });
-            viewport.value.addEventListener('touchend', onDragEnd);
-            viewport.value.addEventListener('touchcancel', onDragEnd);
-            viewport.value.addEventListener('mousedown', onDragStart);
-            window.addEventListener('mousemove', onDragMove);
-            window.addEventListener('mouseup', onDragEnd);
-            viewport.value.addEventListener('mouseleave', () => isDragging && onDragEnd());
-
-            const section = viewport.value.closest('.topics-section');
-            if (section) {
-                section.addEventListener('mouseenter', stopAuto);
-                section.addEventListener('mouseleave', () => !isDragging && startAuto());
-            }
-
-            // 启动自动轮播
-            startAuto();
-        };
-
-        // 销毁轮播：移除事件和定时器
-        const destroyCarousel = () => {
-            stopAuto();
-            if (viewport.value) {
-                viewport.value.removeEventListener('touchstart', onDragStart);
-                viewport.value.removeEventListener('touchmove', onDragMove);
-                viewport.value.removeEventListener('touchend', onDragEnd);
-                viewport.value.removeEventListener('touchcancel', onDragEnd);
-                viewport.value.removeEventListener('mousedown', onDragStart);
-                viewport.value.removeEventListener('mouseleave', onDragEnd);
-                window.removeEventListener('mousemove', onDragMove);
-                window.removeEventListener('mouseup', onDragEnd);
-                const section = viewport.value.closest('.topics-section');
-                if (section) {
-                    section.removeEventListener('mouseenter', stopAuto);
-                    section.removeEventListener('mouseleave', startAuto);
-                }
-            }
-        };
-
-        // 获取数据
-        const fetchTopics = async () => {
-            try {
-                const response = await fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopics');
-                const result = await response.json();
-                topics.value = result.data;
-            } catch (error) {                 
-            }
-        };
-
-        // 组件挂载后：获取数据，然后初始化轮播
-        onMounted(async () => {
-            await fetchTopics();
-            await nextTick();        // 等待 DOM 更新
-            destroyCarousel();        // 清理之前可能残留的事件（首次调用无害）
-            initCarousel();            // 初始化新轮播
-        });
-
-        // 组件卸载前清理
-        onUnmounted(() => {
-            destroyCarousel();
-            window.removeEventListener('resize', updatePosition);
-        });
-
-        // 窗口大小变化时校正位置
-        window.addEventListener('resize', () => updatePosition());
-
-        return { topics, viewport, track, offset };
+  computed: {
+    currentFollowers() {
+      if (!this.currentTopic) return [];
+      return this.followersMap[this.currentTopic.topic_id] || [];
     }
+  },
+
+  methods: {
+    // 处理窗口大小变化
+    handleResize() {
+      this.isMobile = window.innerWidth <= 600;
+    },
+
+    fetchTopics() {
+      return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopics')
+        .then(r => r.json())
+        .then(result => {
+          this.topics = result.data || [];
+        })
+        .catch(error => {});
+    },
+
+    fetchFollowers() {
+      return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopicsfollow')
+        .then(r => r.json())
+        .then(result => {
+          if (result.code === 0 && Array.isArray(result.data)) {
+            const map = {};
+            result.data.forEach(item => {
+              map[item.topic_id] = item.followers || [];
+            });
+            this.followersMap = map;
+          }
+        })
+        .catch(error => {});
+    },
+
+    getFollowerCount(topic) {
+      return this.followersMap[topic.topic_id]?.length || 0;
+    },
+
+    showFollowers(topic) {
+      this.currentTopic = topic;
+      this.dialogVisible = false;
+      this.$nextTick(() => {
+        this.dialogVisible = true;
+      });
+    },
+
+    closeDialog() {
+      this.dialogVisible = false;
+    },
+
+    // 轮播相关方法（保持不变）
+    updatePosition() {
+      if (!this.viewport) return;
+      this.offset = -this.currentIndex * 100;
+    },
+
+    goTo(newIndex) {
+      if (this.slideCount <= 1) return;
+      this.currentIndex = (newIndex % this.slideCount + this.slideCount) % this.slideCount;
+      this.updatePosition();
+    },
+
+    stopAuto() {
+      if (this.autoTimer) {
+        clearInterval(this.autoTimer);
+        this.autoTimer = null;
+      }
+    },
+
+    startAuto() {
+      this.stopAuto();
+      if (this.slideCount <= 1) return;
+      this.autoTimer = setInterval(() => {
+        this.goTo(this.currentIndex + 1);
+      }, 3000);
+    },
+
+    initCarousel() {
+      this.viewport = this.$refs.viewport;
+      this.track = this.$refs.track;
+
+      if (!this.viewport || !this.track) return;
+
+      this.slideCount = this.track.children.length;
+      if (this.slideCount === 0) return;
+
+      this.currentIndex = 0;
+      this.updatePosition();
+
+      const section = this.viewport.closest('.topics-section');
+      if (section) {
+        section.addEventListener('mouseenter', this.stopAuto.bind(this));
+        section.addEventListener('mouseleave', this.startAuto.bind(this));
+      }
+
+      this.startAuto();
+    },
+
+    destroyCarousel() {
+      this.stopAuto();
+      const section = this.viewport?.closest('.topics-section');
+      if (section) {
+        section.removeEventListener('mouseenter', this.stopAuto.bind(this));
+        section.removeEventListener('mouseleave', this.startAuto.bind(this));
+      }
+    }
+  },
+
+  mounted() {
+    window.addEventListener('resize', this.handleResize); // 监听窗口变化
+    this.fetchTopics().then(() => {
+      this.$nextTick(() => {
+        this.destroyCarousel();
+        this.initCarousel();
+      });
+      this.fetchFollowers();
+    });
+  },
+
+  unmounted() {
+    window.removeEventListener('resize', this.handleResize); // 移除监听
+    this.destroyCarousel();
+  }
+};
+
+createApp(appData).mount('#topiclb');
+
+var Typewriter = new Typed('#Typewriter', {
+  strings: ['Vue为核心', 'SoberDesign', '更优雅', '跨平台', '动态响应性', '无限距离'],
+  typeSpeed: 100,
+  backSpeed: 30,
+  smartBackspace: true,
+  loop: true
 });
 
-topiclb.mount('#topiclb');
-</script>
-<script>
-var Typewriter = new Typed('#Typewriter', { strings: ['Vue为核心','SoberDesign','更优雅','跨平台','动态响应性','无限距离'], typeSpeed: 100, backSpeed: 30, smartBackspace: true, loop: true });       
 </script>
 </body>
 </html>

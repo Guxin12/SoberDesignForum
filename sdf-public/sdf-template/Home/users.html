@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        人脉 - <?php echo $config['title'];?>
+    </title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="<?php echo $config['keywords'];?>" />
+    <meta name="description" content="<?php echo $config['description'];?>" />
+    <link rel="icon" href="<?php echo $config['favicon'];?>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/index.css"/>
+</head>
+
+<?php require "header.html";?>
+    
+<main class="main1" data-booted="true">
+    <div class="main1_1">
+        <div class="container" id="page-users">
+            <div class="card-grid">
+                <s-card clickable="true"
+                    v-for="user in users" 
+                    :key="user.user_id"
+                    type="outlined" 
+                    class="user-card"
+                    :href="`?action=oneuser&user_id=${user.user_id}`">
+                    <div class="card-content">
+                        <div class="avatar-container">
+                            <div v-if="user.avatar" class="avatar-circle">
+                                <img :src="user.avatar" alt="" class="avatar-img">
+                            </div>
+                            <div v-else 
+                                 class="avatar-circle" 
+                                 :style="{ backgroundColor: user['avatar-color'] || '#b0b0b0' }">
+                                <span class="avatar-letter">{{ getFirstChar(user.username) }}</span>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <div class="username">{{ user.username }}</div>
+                            <div class="user-role">{{ user.headline || '' }}</div>
+                        </div>
+                        <div class="card-actions">
+                            <s-icon-button type="outlined" class="star-btn">
+                                <s-icon name="star"></s-icon>
+                            </s-icon-button>
+                            <s-popup-menu style="border-radius:25px;">
+                                <s-icon-button slot="trigger" class="more-btn" type="text">
+                                    <s-icon name="more_vert"></s-icon>
+                                </s-icon-button>
+                                <s-popup-menu-item>
+							<svg viewBox="0 -960 960 960" slot="start">
+								<path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z">
+								</path>
+							</svg> 复制链接</s-popup-menu-item>
+						<s-popup-menu-item>
+							<svg viewBox="0 -960 960 960" slot="start">
+								<path d="M200-120v-680h360l16 80h224v400H520l-16-80H280v280h-80Zm300-440Zm86 160h134v-240H510l-16-80H280v240h290l16 80Z"></path>
+							</svg> 举报</s-popup-menu-item>
+					</s-popup-menu>
+                            </s-popup-menu>
+                        </div>
+                    </div>
+                </s-card>
+                <s-empty v-if="users.length === 0">暂时没有人员数据</s-empty>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+<?php require "footer.html";?>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            users: []
+        }
+    },
+    methods: {
+        getFirstChar(username) {
+            if (!username || username.length === 0) return '?';
+            return username.charAt(0);
+        }
+    },
+    mounted() {
+        fetch('./sdf-public/sdf-data/sdf-users.php?type=getAllUsers')
+            .then(response => response.json())
+            .then(json => {
+                if (json.code === 0) {
+                    this.users = json.data || [];
+                }
+            })
+            .catch(() => {
+                this.users = [];
+            });
+    }
+}).mount('#page-users');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        话题 - <?php echo $config['title'];?>
+    </title>
+    <meta charset="utf-8" />
+    <meta name="keywords" content="<?php echo $config['keywords'];?>" />
+    <meta name="description" content="<?php echo $config['description'];?>" />
+    <link rel="icon" href="<?php echo $config['favicon'];?>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/style.css"/>
+    <link rel="stylesheet" href="./sdf-public/sdf-assets/css/index.css"/>
+</head>
+
+<?php require "header.html";?>
+    
+<main class="main1" data-booted="true">
+    <div class="main1_1">
+        <div class="container" id="page-topics">
+            <div class="card-grid">
+                <s-card clickable="true" type="outlined" v-for="topic in topics" :key="topic.topic_id" type="outlined" class="topic-card" :href="`?action=onetopic&topic_id=${topic.topic_id}`">
+                    <img slot="image" v-if="topic.cover" :src="topic.cover" class="cover-img" />
+                    <div slot="headline" style="font-size:18px">{{ topic.name }}</div>
+                    <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;"><s-icon name="star"></s-icon></s-icon-button>
+                    <s-button type="text" @click="showFollowers(topic)" style="float:right;margin:3px 10px 10px 0;">
+                        {{ getFollowerCount(topic) }} 人关注
+                    </s-button>
+                </s-card>
+                <s-empty v-if="topics.length === 0">暂时没有主题数据</s-empty>
+            </div>
+            <s-dialog :size="isMobile ? 'full' : undefined" :showed="dialogVisible" @update:showed="dialogVisible = $event" id="fankDialog">
+                <div slot="headline" style="margin-bottom: 22px;">
+                    {{ currentTopic ? currentTopic.name : '话题' }}的关注者
+                </div>
+                <div v-if="currentFollowers.length === 0" style="padding: 10px; text-align: center;">
+                    <s-empty>暂时没有人关注 {{ currentTopic ? currentTopic.name : '话题' }} </s-empty>
+                </div>
+                <div v-for="follower in currentFollowers" :key="follower.user_id">
+                    <s-list-item href="/" style="width:100%;max-width:100%">
+                        <div slot="start">
+                            <span v-if="!follower.avatar" :style="{ background: follower['avatar-color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
+                                {{ follower.username.charAt(0) }}
+                            </span>
+                            <img v-else :src="follower.avatar" style="display: flex;width: 47px; height: 47px;border-radius: 50%;align-items: center; justify-content: center;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; margin-left: 5px;">
+                            <span style="font-size: 17px;margin-bottom:2px;">{{ follower.username }}</span>
+                        </div>
+                    </s-list-item>
+                </div>
+                <s-button slot="action" style="display: flex;" type="text" @click="closeDialog">确定</s-button>
+            </s-dialog>
+        </div>
+    </div>
+</main>
+<?php require "footer.html";?>
+<script>
+    const { createApp } = Vue;
+    createApp({
+        data() {
+            return {
+                topics: [],
+                followersMap: {},
+                dialogVisible: false,
+                currentTopic: null,
+                isMobile: window.innerWidth <= 600
+            }
+        },
+        computed: {
+            currentFollowers() {
+                if (!this.currentTopic) return [];
+                return this.followersMap[this.currentTopic.topic_id] || [];
+            }
+        },
+        methods: {
+            handleResize() {
+                this.isMobile = window.innerWidth <= 600;
+            },
+            fetchTopics() {
+                return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopics')
+                    .then(response => response.json())
+                    .then(json => {
+                        if (json.code === 0) {
+                            this.topics = json.data || [];
+                        }
+                    })
+                    .catch(() => {
+                        this.topics = [];
+                    });
+            },
+            fetchFollowers() {
+                return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopicsfollow')
+                    .then(r => r.json())
+                    .then(result => {
+                        if (result.code === 0 && Array.isArray(result.data)) {
+                            const map = {};
+                            result.data.forEach(item => {
+                                map[item.topic_id] = item.followers || [];
+                            });
+                            this.followersMap = map;
+                        }
+                    })
+                    .catch(error => {});
+            },
+            getFollowerCount(topic) {
+                return this.followersMap[topic.topic_id]?.length || 0;
+            },
+            showFollowers(topic) {
+                this.currentTopic = topic;
+                this.dialogVisible = false;
+                this.$nextTick(() => {
+                    this.dialogVisible = true;
+                });
+            },
+            closeDialog() {
+                this.dialogVisible = false;
+            },
+            getFirstChar(name) {
+                if (!name || name.length === 0) return '?';
+                return name.charAt(0);
+            }
+        },
+        mounted() {
+            window.addEventListener('resize', this.handleResize);
+            this.fetchTopics();
+            this.fetchFollowers();
+        },
+        unmounted() {
+            window.removeEventListener('resize', this.handleResize);
+        }
+    }).mount('#page-topics');
+</script>
+
+
+</body>
+</html>

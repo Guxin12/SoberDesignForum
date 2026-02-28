@@ -730,23 +730,75 @@
         }) {};
         ie.define(Ht);
         // --- 修改结束 ---
+        // ================== s-card（已修复内部按钮不跳转 + 支持 href）==================
     var Vt = "s-card",
         Yt = g({
             type: ["elevated", "filled", "outlined"],
-            clickable: !1
+            clickable: !1,
+            href: "",
+            target: ""
         }),
         Rt = ":host{display:inline-block;vertical-align:middle;border-radius:12px;position:relative;font-size:.875rem;box-sizing:border-box;max-width:280px;overflow:hidden;color:var(--s-color-on-surface, #191C1E);background:var(--s-color-surface-container-low, #F2F4F5);box-shadow:var(--s-elevation-level1, 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12))}:host([type=filled]){box-shadow:none;background:var(--s-color-surface-container-highest, #E1E3E4)}:host([type=outlined]){box-shadow:none;background:var(--s-color-surface, #F8F9FB);border:solid 1px var(--s-color-outline-variant, #C0C8CC)}:host([clickable=true]){cursor:pointer;transition:box-shadow var(--s-motion-duration-short4, .2s) var(--s-motion-easing-standard, cubic-bezier(.2, 0, 0, 1))}:host([clickable=true]) .ripple{display:block}.action{display:flex;justify-content:flex-end;gap:8px;padding:0 16px}.ripple{display:none;border-radius:0}::slotted([slot=image]){display:block;max-height:160px;min-height:96px;width:100%;object-fit:cover;background:var(--s-color-surface-container, #ECEEF0)}::slotted([slot=headline]){font-size:1.375rem;line-height:22px;margin:12px 16px}::slotted([slot=subhead]){font-size:1rem;margin:-8px 16px 12px}::slotted([slot=text]){line-height:22px;margin:12px 16px;color:var(--s-color-on-surface-variant, #40484C)}::slotted(s-button[slot=action]){margin-bottom:16px}::slotted([slot=headline]+[slot=subhead]){background:red}@media (pointer: fine){:host([clickable=true][type=filled]:hover),:host([clickable=true][type=outlined]:hover){box-shadow:var(--s-elevation-level1, 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12))}:host([clickable=true]:hover){box-shadow:var(--s-elevation-level2, 0 2px 4px -1px rgba(0, 0, 0, .2), 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12))}}",
         _t = '<slot name="start"></slot><slot name="image"></slot><slot name="headline"></slot><slot name="subhead"></slot><slot name="text"></slot><slot></slot><div class="action" part="action"><slot name="action"></slot></div><slot name="end"></slot><s-ripple class="ripple" attached="true" part="ripple"></s-ripple>',
+    
         ae = class extends h({
             style: Rt,
             template: _t,
             props: Yt,
             setup(t) {
-                let e = t.querySelector("slot[name=action]");
-                e.onpointerdown = r => r.stopPropagation()
+                let actionSlot = t.querySelector("slot[name=action]");
+                actionSlot.onpointerdown = r => r.stopPropagation();
+    
+                // ================== 修复后的 href 跳转逻辑 ==================
+                let clickHandler = null;
+                let keyHandler = null;
+    
+                return {
+                    onMounted: () => {
+                        const host = this;
+                        if (!host || !host.href) return;
+    
+                        host.setAttribute('role', 'link');
+                        if (!host.hasAttribute('tabindex')) host.tabIndex = 0;
+    
+                        clickHandler = (ev) => {
+                            if (!host.href) return;
+    
+                            // 关键修复：如果点击的是以下交互元素，则不触发卡片跳转
+                            const interactive = ev.target.closest(
+                                's-button, s-icon-button, s-popup-menu, s-popup-menu-item, button, a, [role="button"], [onclick]'
+                            );
+                            if (interactive) return;   // 让子元素自己处理点击
+    
+                            const target = host.getAttribute('target') || host.target || '';
+                            if (target.toLowerCase() === '_blank') {
+                                window.open(host.href, '_blank', 'noopener,noreferrer');
+                            } else {
+                                window.location.href = host.href;
+                            }
+                        };
+    
+                        keyHandler = (ev) => {
+                            if ((ev.key === 'Enter' || ev.key === ' ') && host.href) {
+                                ev.preventDefault();
+                                clickHandler(ev);
+                            }
+                        };
+    
+                        host.addEventListener('click', clickHandler);
+                        host.addEventListener('keydown', keyHandler);
+                    },
+    
+                    onUnmounted: () => {
+                        if (clickHandler) this.removeEventListener('click', clickHandler);
+                        if (keyHandler) this.removeEventListener('keydown', keyHandler);
+                    }
+                };
             }
         }) {};
+    
     ae.define(Vt);
+    // ================== 修改结束 ==================
     var S = class {
         list = [];
         select;
@@ -1569,7 +1621,7 @@
             disabled: !1,
             type: ["standard", "filled", "filled-tonal", "outlined"]
         }),
-        _o = ":host{display:inline-flex;vertical-align:middle;justify-content:center;align-items:center;cursor:pointer;border-radius:50%;width:40px;aspect-ratio:1;-webkit-aspect-ratio:1;color:var(--s-color-on-surface-variant, #40484C);position:relative;box-sizing:border-box}:host([disabled=true]){pointer-events:none!important;color:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 38%,transparent)!important;background:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 12%,transparent)!important}:host([type=filled]){background:var(--s-color-primary, #006782);color:var(--s-color-on-primary, #ffffff)}:host([type=filled]) ::slotted([slot=badge]){box-shadow:0 0 0 2px var(--s-color-surface, #F8F9FB)}:host([type=filled-tonal]){background:var(--s-color-secondary-container, #CFE6F1);color:var(--s-color-on-secondary-container, #354A53)}:host([type=outlined]){border:solid 1px var(--s-color-outline, #70787D)}:host([type=outlined][disabled=true]){background:none!important;border-color:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 12%,transparent)!important}::slotted(:not([slot=badge])){color:inherit}::slotted(svg){width:24px;height:24px;fill:currentColor}::slotted([slot=badge]){position:absolute;right:4px;top:0;flex-shrink:0}@supports not (color: color-mix(in srgb,black,white)){:host([disabled=true]){background:var(--s-color-surface-container-high, #E7E8EA)!important;color:var(--s-color-outline, #70787D)!important}:host([type=outlined][disabled=true]){border-color:var(--s-color-surface-container-highest, #E1E3E4)!important}}",
+        _o = ":host{display:inline-flex;vertical-align:middle;justify-content:center;align-items:center;cursor:pointer;border-radius:50%;width:40px;aspect-ratio:1;-webkit-aspect-ratio:1;color:var(--s-color-on-surface-variant, #40484C);position:relative;box-sizing:border-box}:host([disabled=true]){pointer-events:none!important;color:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 38%,transparent)!important;background:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 12%,transparent)!important}:host([type=filled]){background:var(--s-color-primary, #006782);color:var(--s-color-on-primary, #ffffff)}:host([type=filled]) ::slotted([slot=badge]){box-shadow:0 0 0 2px var(--s-color-surface, #F8F9FB)}:host([type=filled-tonal]){background:var(--s-color-secondary-container, #CFE6F1);color:var(--s-color-on-secondary-container, #354A53)}:host([type=outlined]){border:solid 1px var(--s-color-outline-variant, #C0C8CC)}:host([type=outlined][disabled=true]){background:none!important;border-color:color-mix(in srgb,var(--s-color-on-surface, #191C1E) 12%,transparent)!important}::slotted(:not([slot=badge])){color:inherit}::slotted(svg){width:24px;height:24px;fill:currentColor}::slotted([slot=badge]){position:absolute;right:4px;top:0;flex-shrink:0}@supports not (color: color-mix(in srgb,black,white)){:host([disabled=true]){background:var(--s-color-surface-container-high, #E7E8EA)!important;color:var(--s-color-outline, #70787D)!important}:host([type=outlined][disabled=true]){border-color:var(--s-color-surface-container-highest, #E1E3E4)!important}}",
         Oo = '<slot name="start"></slot><slot></slot><slot name="end"></slot><s-ripple class="ripple" attached="true" part="ripple"></s-ripple><slot name="badge"></slot>',
         be = class extends h({
             style: _o,
@@ -1798,7 +1850,7 @@
             folded: !0,
             href: ""  // 添加 href 属性
         }),
-        def = `:host{display:flex;flex-direction:column;border-top: solid 1px var(--s-color-outline-variant, #C0C8CC);;color:var(--s-color-on-surface, #191C1E)}
+        def = `:host{display:flex;flex-direction:column;border-top: solid 1px var(--s-color-outline-variant, #C0C8CC);color:var(--s-color-on-surface, #191C1E)}
         .container{display:flex;align-items:center;height:70px;padding:0 20px;flex-shrink:0}
         .text{flex-grow:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .toggle-icon{width:24px;height:24px;display:none;margin-right:-8px;margin-left:12px;transform:rotate(-90deg);transition:transform var(--s-motion-duration-short4, .2s) var(--s-motion-easing-standard, cubic-bezier(.2, 0, 0, 1));fill:var(--s-color-on-surface-variant, #40484C)}
@@ -2195,7 +2247,7 @@
             showed: Event,
             closed: Event
         }),
-        Ir = ":host{display:inline-block;vertical-align:middle;text-align:left}dialog{inset:0;width:100%;height:100%;background:none;border:none;padding:0;max-width:none;max-height:none;position:relative;overflow:hidden;color:inherit;outline:none}dialog::backdrop{background:none}.scrim{position:absolute;inset:0;width:100%;height:100%}.container{display:block;position:absolute;max-width:100%;max-height:100%;width:fit-content;height:fit-content;outline:none}::slotted(:not([slot])){border-radius:4px;max-width:inherit;max-height:inherit;box-shadow:var(--s-elevation-level2, 0 2px 4px -1px rgba(0, 0, 0, .2), 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12));background:var(--s-color-surface-container, #ECEEF0)}",
+        Ir = ":host{display:inline-block;vertical-align:middle;text-align:left}dialog{inset:0;width:100%;height:100%;background:none;border:none;padding:0;max-width:none;max-height:none;position:relative;overflow:hidden;color:inherit;outline:none}dialog::backdrop{background:none}.scrim{position:absolute;inset:0;width:100%;height:100%}.container{display:block;position:absolute;max-width:100%;max-height:100%;width:fit-content;height:fit-content;outline:none}::slotted(:not([slot])){border-radius:20px;max-width:inherit;max-height:inherit;box-shadow:var(--s-elevation-level2, 0 2px 4px -1px rgba(0, 0, 0, .2), 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12));background:var(--s-color-surface-container, #ECEEF0)}",
         Wr = '<slot name="trigger"></slot><dialog class="popup" part="popup"><div class="scrim" part="scrim"></div><slot class="container" part="container"></slot></dialog>',
         Vr = (s, t, e, r) => {
             let a = {
@@ -2337,7 +2389,7 @@
             }
         }) {},
         Or = "s-popup-menu-item",
-        Xr = ":host{display:flex;align-items:center;height:40px;margin:0 4px;padding:0 12px;cursor:pointer;position:relative;border-radius:4px;color:var(--s-color-on-surface, #191C1E)}.text{flex-grow:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}::slotted(:is(svg,s-icon)){fill:currentColor;height:24px;width:24px;color:var(--s-color-on-surface-variant, #40484C)}::slotted([slot]){flex-shrink:0}::slotted([slot=start]){margin-left:-4px;margin-right:8px}::slotted([slot=end]){margin-left:8px;margin-right:-6px}",
+        Xr = ":host{display:flex;align-items:center;height:40px;margin:0 4px;padding:0 12px;cursor:pointer;position:relative;border-radius:20px;color:var(--s-color-on-surface, #191C1E)}.text{flex-grow:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}::slotted(:is(svg,s-icon)){fill:currentColor;height:24px;width:24px;color:var(--s-color-on-surface-variant, #40484C)}::slotted([slot]){flex-shrink:0}::slotted([slot=start]){margin-left:-4px;margin-right:8px}::slotted([slot=end]){margin-left:8px;margin-right:-6px}",
         Gr = '<slot name="start"></slot><div class="text" part="text"><slot></slot></div><slot name="end"></slot><s-ripple attached="true"></s-ripple>',
         Le = class extends h({
             style: Xr,
