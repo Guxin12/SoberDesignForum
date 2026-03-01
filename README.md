@@ -9,6 +9,8 @@
 
 ## 预计用到的技术
 + SoberUI框架
++ jQuery
++ MD5
 + Vue.js (Vue3)
 
 ## 联系方式
