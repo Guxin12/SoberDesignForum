@@ -23,7 +23,17 @@
                 <s-card clickable="true" type="outlined" v-for="topic in topics" :key="topic.topic_id" type="outlined" class="topic-card" :href="`?action=onetopic&topic_id=${topic.topic_id}`">
                     <img slot="image" v-if="topic.cover" :src="topic.cover" class="cover-img" />
                     <div slot="headline" style="font-size:18px">{{ topic.name }}</div>
-                    <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;"><s-icon name="star"></s-icon></s-icon-button>
+                    <s-icon-button 
+                        type="outlined"
+                        style="float:left;margin:3px 0 10px 15px;"
+                        @click.stop="toggleFollow(topic)">
+                        <svg v-if="!isFollowing(topic)" viewBox="0 -960 960 960">
+                            <path d="m305-704 112-145q12-16 28.5-23.5T480-880q18 0 34.5 7.5T543-849l112 145 170 57q26 8 41 29.5t15 47.5q0 12-3.5 24T866-523L756-367l4 164q1 35-23 59t-56 24q-2 0-22-3l-179-50-179 50q-5 2-11 2.5t-11 .5q-32 0-56-24t-23-59l4-165L95-523q-8-11-11.5-23T80-570q0-25 14.5-46.5T135-647l170-57Zm49 69-194 64 124 179-4 191 200-55 200 56-4-192 124-177-194-66-126-165-126 165Zm126 135Z"></path>
+                        </svg>
+                        <svg v-else viewBox="0 -960 960 960" style="color: var(--s-color-primary, #006782);">
+                            <path d="m305-704 112-145q12-16 28.5-23.5T480-880q18 0 34.5 7.5T543-849l112 145 170 57q26 8 41 29.5t15 47.5q0 12-3.5 24T866-523L756-367l4 164q1 35-23 59t-56 24q-2 0-22-3l-179-50-179 50q-5 2-11 2.5t-11 .5q-32 0-56-24t-23-59l4-165L95-523q-8-11-11.5-23T80-570q0-25 14.5-46.5T135-647l170-57Z"></path>
+                        </svg>
+                    </s-icon-button>
                     <s-button type="text" @click="showFollowers(topic)" style="float:right;margin:3px 10px 10px 0;">
                         {{ getFollowerCount(topic) }} 人关注
                     </s-button>
@@ -38,9 +48,9 @@
                     <s-empty>暂时没有人关注 {{ currentTopic ? currentTopic.name : '话题' }} </s-empty>
                 </div>
                 <div v-for="follower in currentFollowers" :key="follower.user_id">
-                    <s-list-item href="/" style="width:100%;max-width:100%">
+                    <s-list-item :href="`?action=oneuser&user_id=${follower.user_id}`" style="width:100%;max-width:100%">
                         <div slot="start">
-                            <span v-if="!follower.avatar" :style="{ background: follower['avatar-color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
+                            <span v-if="!follower.avatar" :style="{ background: follower['avatar_color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
                                 {{ follower.username.charAt(0) }}
                             </span>
                             <img v-else :src="follower.avatar" style="display: flex;width: 47px; height: 47px;border-radius: 50%;align-items: center; justify-content: center;">
@@ -57,7 +67,7 @@
 </main>
 <?php require "footer.html";?>
 <script>
-    const { createApp } = Vue;
+const { createApp } = Vue;
     createApp({
         data() {
             return {
@@ -65,7 +75,8 @@
                 followersMap: {},
                 dialogVisible: false,
                 currentTopic: null,
-                isMobile: window.innerWidth <= 600
+                isMobile: window.innerWidth <= 600,
+                currentUserId: <?php echo isset($userId) ? (int)$userId : 0; ?>
             }
         },
         computed: {
@@ -78,48 +89,67 @@
             handleResize() {
                 this.isMobile = window.innerWidth <= 600;
             },
+    
             fetchTopics() {
                 return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopics')
-                    .then(response => response.json())
-                    .then(json => {
-                        if (json.code === 0) {
-                            this.topics = json.data || [];
-                        }
-                    })
-                    .catch(() => {
-                        this.topics = [];
-                    });
+                    .then(r => r.json())
+                    .then(json => { if (json.code === 0) this.topics = json.data || []; })
+                    .catch(() => { this.topics = []; });
             },
+    
             fetchFollowers() {
                 return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopicsfollow')
                     .then(r => r.json())
                     .then(result => {
                         if (result.code === 0 && Array.isArray(result.data)) {
                             const map = {};
-                            result.data.forEach(item => {
-                                map[item.topic_id] = item.followers || [];
-                            });
+                            result.data.forEach(item => map[item.topic_id] = item.followers || []);
                             this.followersMap = map;
                         }
                     })
-                    .catch(error => {});
+                    .catch(() => {});
             },
+    
             getFollowerCount(topic) {
                 return this.followersMap[topic.topic_id]?.length || 0;
             },
+    
+            isFollowing(topic) {
+                if (!this.currentUserId || !topic) return false;
+                const followers = this.followersMap[topic.topic_id] || [];
+                return followers.some(f => Number(f.user_id) === Number(this.currentUserId));
+            },
+    
+            toggleFollow(topic) {                    
+                const topic_id = topic.topic_id;
+                fetch(`./sdf-public/sdf-data/SDF-index1.php?type=FollowTopic&topic_id=${topic_id}`)
+                    .then(response => response.text())
+                    .then(text => {
+                        let json;
+                        try {
+                            json = JSON.parse(text);
+                        } catch (e) {
+                        }
+    
+                        if (json.code === 0) {
+                            sober.Snackbar.builder(json.msg);
+                            this.fetchFollowers();
+                        } else {
+                            sober.Snackbar.builder(json.msg);
+                        }
+                    })
+                    .catch(err => {
+                    });
+            },
+    
             showFollowers(topic) {
                 this.currentTopic = topic;
                 this.dialogVisible = false;
-                this.$nextTick(() => {
-                    this.dialogVisible = true;
-                });
+                this.$nextTick(() => { this.dialogVisible = true; });
             },
+    
             closeDialog() {
                 this.dialogVisible = false;
-            },
-            getFirstChar(name) {
-                if (!name || name.length === 0) return '?';
-                return name.charAt(0);
             }
         },
         mounted() {

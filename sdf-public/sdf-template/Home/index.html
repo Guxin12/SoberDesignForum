@@ -36,9 +36,19 @@
                           <s-card type="outlined" style="width: 100%; max-width: 100%;" :href="`?action=onetopic&topic_id=${topic.topic_id}`">
                             <div slot="image"></div>
                             <div slot="headline" style="margin-top:15px;">{{ topic.name }}</div>
-                            <s-icon-button type="outlined" style="float:left;margin:3px 0 10px 15px;">
-                              <s-icon name="star"></s-icon>
+                            <s-icon-button 
+                              type="outlined"
+                              style="float:left;margin:3px 0 10px 15px;"
+                              @click.stop="toggleFollow(topic)"
+                            >
+                              <svg v-if="!isFollowing(topic)" viewBox="0 -960 960 960">
+                                <path d="m305-704 112-145q12-16 28.5-23.5T480-880q18 0 34.5 7.5T543-849l112 145 170 57q26 8 41 29.5t15 47.5q0 12-3.5 24T866-523L756-367l4 164q1 35-23 59t-56 24q-2 0-22-3l-179-50-179 50q-5 2-11 2.5t-11 .5q-32 0-56-24t-23-59l4-165L95-523q-8-11-11.5-23T80-570q0-25 14.5-46.5T135-647l170-57Zm49 69-194 64 124 179-4 191 200-55 200 56-4-192 124-177-194-66-126-165-126 165Zm126 135Z"></path>
+                              </svg>
+                              <svg v-else viewBox="0 -960 960 960" style="color: var(--s-color-primary, #006782);">
+                                <path d="m305-704 112-145q12-16 28.5-23.5T480-880q18 0 34.5 7.5T543-849l112 145 170 57q26 8 41 29.5t15 47.5q0 12-3.5 24T866-523L756-367l4 164q1 35-23 59t-56 24q-2 0-22-3l-179-50-179 50q-5 2-11 2.5t-11 .5q-32 0-56-24t-23-59l4-165L95-523q-8-11-11.5-23T80-570q0-25 14.5-46.5T135-647l170-57Z"></path>
+                              </svg>
                             </s-icon-button>
+                            
                             <s-button type="text" @click="showFollowers(topic)" style="float:right;margin:3px 10px 10px 0;">
                               {{ getFollowerCount(topic) }} 人关注
                             </s-button>
@@ -51,9 +61,9 @@
                 	<div slot="headline" style="margin-bottom: 22px;"> {{ currentTopic ? currentTopic.name : '话题' }}的关注者 </div>
                 	<div v-if="currentFollowers.length === 0" style="padding: 10px; text-align: center;"> <s-empty>暂时没有人关注 {{ currentTopic ? currentTopic.name : '话题' }} </s-empty> </div>
                 <div v-for="follower in currentFollowers" :key="follower.user_id">
-                	<s-list-item href="/" style="width:100%;max-width:100%">
+                	<s-list-item :href="`?action=oneuser&user_id=${follower.user_id}`" style="width:100%;max-width:100%">
                             <div slot="start">
-                                <span v-if="!follower.avatar" :style="{ background: follower['avatar-color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
+                                <span v-if="!follower.avatar" :style="{ background: follower['avatar_color'] || '#b0b0b0' }" style="display: flex; font-size: 30px;width: 47px; height: 47px;color: white;border-radius: 50%;align-items: center; justify-content: center;">
                                     {{ follower.username.charAt(0) }}
                                 </span>
                                 <img v-else :src="follower.avatar" style="display: flex;width: 47px; height: 47px;border-radius: 50%;align-items: center; justify-content: center;">
@@ -125,6 +135,11 @@
                     </s-card>
                 </div>                
     		</div>
+    		
+    		
+			    
+				<s-button id="exit_login"> 退出登录 </s-button>
+		
     	</div>
     </main>
 
@@ -147,7 +162,8 @@ const appData = {
       track: null,
       dialogVisible: false,
       currentTopic: null,
-      isMobile: window.innerWidth <= 600 // 新增：移动端检测
+      isMobile: window.innerWidth <= 600,
+      currentUserId: <?php echo isset($userId) ? (int)$userId : 0; ?>
     };
   },
 
@@ -159,7 +175,6 @@ const appData = {
   },
 
   methods: {
-    // 处理窗口大小变化
     handleResize() {
       this.isMobile = window.innerWidth <= 600;
     },
@@ -173,6 +188,7 @@ const appData = {
         .catch(error => {});
     },
 
+    // 新增：获取所有话题的关注者数据
     fetchFollowers() {
       return fetch('./sdf-public/sdf-data/sdf-index.php?type=getAllTopicsfollow')
         .then(r => r.json())
@@ -192,6 +208,38 @@ const appData = {
       return this.followersMap[topic.topic_id]?.length || 0;
     },
 
+    // 新增：判断当前用户是否关注了该话题
+    isFollowing(topic) {
+      if (!this.currentUserId || !topic) return false;
+      const followers = this.followersMap[topic.topic_id] || [];
+      return followers.some(f => Number(f.user_id) === Number(this.currentUserId));
+    },
+
+    // 新增：关注/取消关注操作
+    toggleFollow(topic) {
+      const topic_id = topic.topic_id;
+      fetch(`./sdf-public/sdf-data/SDF-index1.php?type=FollowTopic&topic_id=${topic_id}`)
+        .then(response => response.text())
+        .then(text => {
+          let json;
+          try {
+            json = JSON.parse(text);
+          } catch (e) {
+            console.error('解析响应失败', e);
+            return;
+          }
+          if (json.code === 0) {
+            sober.Snackbar.builder(json.msg); // 提示成功
+            this.fetchFollowers(); // 重新获取关注者数据，更新人数和状态
+          } else {
+            sober.Snackbar.builder(json.msg); // 提示错误
+          }
+        })
+        .catch(err => {
+          console.error('关注操作失败', err);
+        });
+    },
+
     showFollowers(topic) {
       this.currentTopic = topic;
       this.dialogVisible = false;
@@ -204,7 +252,7 @@ const appData = {
       this.dialogVisible = false;
     },
 
-    // 轮播相关方法（保持不变）
+    // 以下为轮播相关方法（保持不变）
     updatePosition() {
       if (!this.viewport) return;
       this.offset = -this.currentIndex * 100;
@@ -263,18 +311,18 @@ const appData = {
   },
 
   mounted() {
-    window.addEventListener('resize', this.handleResize); // 监听窗口变化
+    window.addEventListener('resize', this.handleResize);
     this.fetchTopics().then(() => {
       this.$nextTick(() => {
         this.destroyCarousel();
         this.initCarousel();
       });
-      this.fetchFollowers();
+      this.fetchFollowers(); // 获取关注者数据
     });
   },
 
   unmounted() {
-    window.removeEventListener('resize', this.handleResize); // 移除监听
+    window.removeEventListener('resize', this.handleResize);
     this.destroyCarousel();
   }
 };

@@ -17,56 +17,50 @@
 <?php require "header.html";?>
     
 <main class="main1" data-booted="true">
-    <div class="main1_1">
-        <div class="container" id="page-users">
-            <div class="card-grid">
-                <s-card clickable="true"
-                    v-for="user in users" 
-                    :key="user.user_id"
-                    type="outlined" 
-                    class="user-card"
-                    :href="`?action=oneuser&user_id=${user.user_id}`">
-                    <div class="card-content">
-                        <div class="avatar-container">
-                            <div v-if="user.avatar" class="avatar-circle">
-                                <img :src="user.avatar" alt="" class="avatar-img">
-                            </div>
-                            <div v-else 
-                                 class="avatar-circle" 
-                                 :style="{ backgroundColor: user['avatar-color'] || '#b0b0b0' }">
-                                <span class="avatar-letter">{{ getFirstChar(user.username) }}</span>
-                            </div>
-                        </div>
-                        <div class="user-info">
-                            <div class="username">{{ user.username }}</div>
-                            <div class="user-role">{{ user.headline || '' }}</div>
-                        </div>
-                        <div class="card-actions">
-                            <s-icon-button type="outlined" class="star-btn">
-                                <s-icon name="star"></s-icon>
-                            </s-icon-button>
-                            <s-popup-menu style="border-radius:25px;">
-                                <s-icon-button slot="trigger" class="more-btn" type="text">
-                                    <s-icon name="more_vert"></s-icon>
-                                </s-icon-button>
-                                <s-popup-menu-item>
-							<svg viewBox="0 -960 960 960" slot="start">
-								<path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z">
-								</path>
-							</svg> 复制链接</s-popup-menu-item>
-						<s-popup-menu-item>
-							<svg viewBox="0 -960 960 960" slot="start">
-								<path d="M200-120v-680h360l16 80h224v400H520l-16-80H280v280h-80Zm300-440Zm86 160h134v-240H510l-16-80H280v240h290l16 80Z"></path>
-							</svg> 举报</s-popup-menu-item>
-					</s-popup-menu>
-                            </s-popup-menu>
-                        </div>
-                    </div>
-                </s-card>
-                <s-empty v-if="users.length === 0">暂时没有人员数据</s-empty>
-            </div>
-        </div>
-    </div>
+	<div class="main1_1">
+		<div class="container" id="page-users">
+			<div class="card-grid">
+				<s-card clickable="true" v-for="user in users" :key="user.user_id" type="outlined" class="user-card" :href="`?action=oneuser&user_id=${user.user_id}`">
+					<div class="card-content">
+						<div class="avatar-container">
+							<div v-if="user.avatar" class="avatar-circle">
+								<img :src="user.avatar" alt="" class="avatar-img">
+							</div>
+							<div v-else class="avatar-circle" :style="{ backgroundColor: user['avatar_color'] || '#b0b0b0' }">
+								<span class="avatar-letter">{{ getFirstChar(user.username) }}</span>
+							</div>
+						</div>
+						<div class="user-info">
+							<div class="username">{{ user.username }}</div>
+							<div class="user-role">{{ user.headline || '' }}</div>
+						</div>
+						<div class="card-actions">
+							<s-icon-button type="outlined" class="star-btn" style="float:left;">
+								<s-icon name="star"></s-icon>
+							</s-icon-button>
+							<s-popup-menu style="border-radius:25px;">
+								<s-icon-button slot="trigger" class="more-btn" stye="float:right" type="text">
+									<s-icon name="more_vert"></s-icon>
+								</s-icon-button>
+								<s-popup-menu-item @click="copyUserLink(user.user_id)">
+									<svg viewBox="0 -960 960 960" slot="start">
+										<path
+											d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z">
+										</path>
+									</svg> 复制链接 </s-popup-menu-item>
+								<s-popup-menu-item>
+									<svg viewBox="0 -960 960 960" slot="start">
+										<path d="M200-120v-680h360l16 80h224v400H520l-16-80H280v280h-80Zm300-440Zm86 160h134v-240H510l-16-80H280v240h290l16 80Z"></path>
+									</svg> 举报</s-popup-menu-item>
+							</s-popup-menu>
+							</s-popup-menu>
+						</div>
+					</div>
+				</s-card>
+				<s-empty v-if="users.length === 0">暂时没有人员数据</s-empty>
+			</div>
+		</div>
+	</div>
 </main>
 
 
@@ -86,7 +80,79 @@ createApp({
         getFirstChar(username) {
             if (!username || username.length === 0) return '?';
             return username.charAt(0);
+        },
+        copyUserLink(userId) {
+            const currentUrl = window.location.href.split('?')[0].split('#')[0];
+            const fullLink = `${currentUrl}?action=oneuser&user_id=${userId}`;
+            navigator.clipboard.writeText(fullLink)
+                .then(() => {
+                    sober.Snackbar.show({
+                        text: '用户链接已复制到剪贴板',
+                        duration: 2000,
+                        align: 'top'
+                    });
+                })
+                .catch(err => {
+                    this.fallbackCopyText(fullLink);
+                });
+        },
+        fallbackCopyText(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    // 确保元素在视口内但不可见
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    textArea.style.left = '0';
+    textArea.style.top = '0';
+    textArea.style.width = '1px';
+    textArea.style.height = '1px';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    document.body.appendChild(textArea);
+    
+    // 聚焦并选中文本，兼容移动端和旧浏览器
+    textArea.focus();
+    textArea.select();
+    if (textArea.setSelectionRange) {
+        // 对于可输入元素，确保全选
+        textArea.setSelectionRange(0, textArea.value.length);
+    }
+    
+    // 尝试复制，并添加短暂延迟确保选中生效
+    setTimeout(() => {
+        let successful = false;
+        try {
+            // 检查浏览器是否支持 copy 命令
+            if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
+                successful = document.execCommand('copy');
+            }
+        } catch (err) {
+            successful = false;
         }
+        
+        // 移除元素
+        document.body.removeChild(textArea);
+        
+        // 根据结果显示提示
+        if (successful) {
+            sober.Snackbar.show({
+                text: '用户链接已复制到剪贴板',
+                duration: 2000,
+                align: 'top'
+            });
+        } else {
+            sober.Snackbar.show({
+                text: '复制失败，请手动复制链接',
+                duration: 3000,
+                align: 'top'
+            });
+        }
+    }, 100); // 100ms 延迟，确保UI更新
+}
+
     },
     mounted() {
         fetch('./sdf-public/sdf-data/sdf-users.php?type=getAllUsers')
@@ -102,6 +168,9 @@ createApp({
     }
 }).mount('#page-users');
 </script>
+
+
+
 
 </body>
 </html>

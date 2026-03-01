@@ -10,7 +10,8 @@ if(file_exists(__CONFIG_DIR__.'/install.lock')){
 		require_once __CONFIG_DIR__.'/database.php';		
 		$server = include __CONFIG_DIR__.'/server.php';	
 		$websetting = include __CONFIG_DIR__.'/webSet.php';
-		//网站配置信息
+		$user = include __CONFIG_DIR__.'/user.php';
 		$config = array_merge($server, $websetting);
+		$user_config = array_merge($user);
 	}
 }

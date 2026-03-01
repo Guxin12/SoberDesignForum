@@ -3,6 +3,15 @@ window.$ = jQuery
 var page = document.querySelector('s-page');
 var radioButtons = document.querySelectorAll('s-radio-button[name="theme"]');
 
+
+function openLoginDialog() {
+    const dialog = document.getElementById('LoginUser');
+    dialog.showed = false;
+    dialog.showed = true;
+}
+
+
+
 //以下是滑块颜色主题
 
 // 初始化颜色
@@ -262,4 +271,190 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function formSumbit() {
+    var options = {
+        success: submit,
+        timeout: 3000,
+    }
 
+    function submit(data) {
+        var code = JSON.parse(data).code;
+        var msg = JSON.parse(data).msg;
+        if (code == "200") {
+            sober.Snackbar.builder(msg)
+            setTimeout(function() {
+                window.location.reload();
+            }, 1500);
+        } else {
+            sober.Snackbar.builder(msg)
+        }
+    };
+
+    $('form').submit(function() {
+        $(this).ajaxSubmit(options);
+        return false;
+    });
+}
+
+function getRequestParam(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) { return pair[1]; }
+    }
+    return (false);
+}
+
+function checkMailAddress(v) {
+    var reg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/; //正则表达式
+    if (!reg.test(v)) { //正则验证不通过，格式不对
+        return false;
+    } else {
+        return true;
+    }
+}
+
+// 定义更新应用栏的函数
+function updateAppBarAfterLogin(user) {
+
+	// 删除所有未登录按钮（类 auth-dependent）
+	document.querySelectorAll('.auth-dependent').forEach(el => el.remove());
+
+	// 删除可能存在的旧头像（防止重复）
+	document.querySelectorAll('.user-avatar').forEach(el => el.remove());
+
+	// 创建头像元素
+	let avatarElement;
+	if (user.avatar) {
+		avatarElement = document.createElement('img');
+		avatarElement.src = user.avatar;
+		avatarElement.style.cssText = 'display:flex; width:40px; height:40px; border-radius:50%; align-items:center; justify-content:center;';
+	} else {
+		avatarElement = document.createElement('span');
+		// 获取用户名首字符（支持中文）
+		const firstChar = user.username.charAt(0);
+		avatarElement.textContent = firstChar;
+		const bgColor = user.avatar_color || 'var(--s-color-primary, #006782)';
+		avatarElement.style.cssText = `background: ${bgColor}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;`;
+	}
+	avatarElement.classList.add('user-avatar');
+	avatarElement.setAttribute('slot', 'action');
+
+	// 添加到应用栏
+	document.querySelector('s-appbar').appendChild(avatarElement);
+}
+
+function updateAppBarAfterLogout() {
+	// 删除当前头像
+	document.querySelectorAll('.user-avatar').forEach(el => el.remove());
+
+	// 检查是否已存在未登录按钮，若不存在则重建
+	if (document.querySelectorAll('.auth-dependent').length === 0) {
+		// 重建桌面按钮
+		const desktopButtons = document.createElement('div');
+		desktopButtons.className = 'desktop-buttons auth-dependent';
+		desktopButtons.setAttribute('slot', 'action');
+		desktopButtons.innerHTML = `
+            <s-button class="login-btn" onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"></path>
+                </svg>                
+                登录
+            </s-button>                 
+            <s-button type="outlined" class="register-btn" onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"></path>
+                </svg>
+                注册
+            </s-button>
+        `;
+
+		// 重建移动菜单
+		const mobileMenu = document.createElement('s-popup-menu');
+		mobileMenu.className = 'mobile-menu auth-dependent';
+		mobileMenu.setAttribute('slot', 'action');
+		mobileMenu.innerHTML = `
+            <s-icon-button slot="trigger">
+                <s-icon name="more_vert"></s-icon>
+            </s-icon-button>
+            <s-popup-menu-item onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"></path>
+                </svg>
+                登录
+            </s-popup-menu-item>
+            <s-popup-menu-item onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"></path>
+                </svg>
+                注册
+            </s-popup-menu-item>
+        `;
+
+		const appbar = document.querySelector('s-appbar');
+		appbar.appendChild(desktopButtons);
+		appbar.appendChild(mobileMenu);
+	}
+}
+
+$('#exit_login').click(function() {
+    var exitLogin = confirm('你真的要退出登录吗？');
+    if (exitLogin) {
+        fetch('./sdf-public/sdf-data/SDF-index1.php?type=exitLogin')
+            .then(response => response.json())
+            .then(json => {
+                sober.Snackbar.show({
+                    text: json.msg,
+                    duration: 2000,
+                    align: 'top'
+                });
+                if (json.code == 0) {
+                    // 退出成功，恢复未登录界面
+                    updateAppBarAfterLogout();
+                }
+            });
+    }
+});
+
+$('#submit').click(function() {
+    var username = $('#username').val();
+    var rawPassword = $('#password').val();
+    if (username && rawPassword) {
+        var hashedPassword = md5(rawPassword);
+        $.ajax({
+            url: './sdf-public/sdf-data/SDF-index1.php',
+            method: 'POST',
+            data: {
+                type: 'login',
+                username: username,
+                password: hashedPassword
+            },
+            dataType: 'json',  // 直接指定JSON，避免手动解析
+            success: function(res) {
+                sober.Snackbar.show({
+                    text: res.msg,
+                    duration: 2000,
+                    align: 'top'
+                });
+                if (res.code == 0) {
+                    // 登录成功，局部更新应用栏
+                    updateAppBarAfterLogin(res.data);
+                }
+            },
+            error: function() {
+                sober.Snackbar.show({
+                    text: '网络错误！',
+                    duration: 2000,
+                    align: 'top'
+                });
+            }
+        });
+    } else {
+        sober.Snackbar.show({
+            text: '请输入完整！',
+            duration: 2000,
+            align: 'top'
+        });
+    }
+});

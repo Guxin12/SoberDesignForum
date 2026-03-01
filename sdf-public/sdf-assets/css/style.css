@@ -132,7 +132,38 @@ s-picker::part(container) {
 /*以上调整颜色类css*/
 
 
+/* 响应式样式 */
+.desktop-buttons {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
 
+.mobile-menu {
+	display: none;
+}
+
+/* 在小屏幕（手机）上隐藏桌面按钮，显示移动菜单 */
+@media (max-width: 768px) {
+	.desktop-buttons {
+		display: none;
+	}
+	
+	.mobile-menu {
+		display: block;
+	}
+}
+
+/* 在中等和大屏幕（平板和电脑）上显示桌面按钮，隐藏移动菜单 */
+@media (min-width: 769px) {
+	.desktop-buttons {
+		display: flex;
+	}
+	
+	.mobile-menu {
+		display: none;
+	}
+}
 
 
 

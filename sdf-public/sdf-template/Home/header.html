@@ -1,5 +1,28 @@
 <body id="loading">
-	<script src="./sdf-public/sdf-assets/js/sober-theme.min.js"></script>
+<?php
+session_start();
+// 判断登录状态
+$isLoggedIn = isset($_SESSION['login']) && $_SESSION['login'] === 'login';
+$userId = $isLoggedIn && isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+if ($isLoggedIn && $userId) {
+    $currentUser = null;
+    foreach ($user_config as $u) {
+        if ($u['user_id'] == $userId) {
+            $currentUser = $u;
+            break;
+        }
+    }
+    if (!$currentUser) {
+        $isLoggedIn = false;
+        unset($_SESSION['login'], $_SESSION['user_id']);
+    } else {
+        // 将 $user_config 重新赋值为当前用户的一维数组，方便后续代码直接使用
+        $user_config = $currentUser;
+    }
+}
+?>
+    <script src="./sdf-public/sdf-assets/js/sober-theme.min.js"></script>
 	<s-page>
 		<s-drawer>
 			<div slot="start">
@@ -32,36 +55,115 @@
 </svg> 人脉 </s-menu-item>
 				</s-menu>
 			</div>
-			<s-appbar class="appbar">
-				<s-icon-button slot="navigation" onclick="document.querySelector('s-drawer').toggle()">
-					<s-icon name="menu"></s-icon>
-				</s-icon-button>
-				<div slot="headline"> <?php echo $config['title'];?> </div>
-				<s-picker slot="action">
-					<s-tooltip slot="trigger">
-						<s-icon-button slot="trigger">
-							<s-icon>
-								<svg viewBox="0 -960 960 960">
-									<path
-										d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 32.5-156t88-127Q256-817 330-848.5T488-880q80 0 151 27.5t124.5 76q53.5 48.5 85 115T880-518q0 115-70 176.5T640-280h-74q-9 0-12.5 5t-3.5 11q0 12 15 34.5t15 51.5q0 50-27.5 74T480-80Zm0-400Zm-220 40q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120-160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm200 0q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120 160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17ZM480-160q9 0 14.5-5t5.5-13q0-14-15-33t-15-57q0-42 29-67t71-25h70q66 0 113-38.5T800-518q0-121-92.5-201.5T488-800q-136 0-232 93t-96 227q0 133 93.5 226.5T480-160Z">
-									</path>
-								</svg>
-							</s-icon>
-						</s-icon-button> 主题颜色 
-				    </s-tooltip>
-					<div style="width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box;padding: 10px;gad:5px;display:flex;flex-direction:column;">
-						<s-card type="filled" clickable="false" style="--s-color-surface-container-highest:var(--s-color-surface-container-low);margin: 0px 0px 10px 0px;border-radius:5px; width: 100%;height: 80px;display: block; padding: 24px;box-sizing: border-box;">
-							<s-card type="outlined"
-								style="border-radius:18px;height: 18px; width: 150px; display: block; background: linear-gradient(to right,hsl(0, 100%, 50%),hsl(60, 100%, 50%),hsl(120, 100%, 50%),hsl(180, 100%, 50%),hsl(240, 100%, 50%),hsl(300, 100%, 50%),hsl(360, 100%, 50%));"></s-card>
-							<s-slider id="hue-slider" style="margin:10px 0 0 0;" labeled="true" max="359"></s-slider>
-						</s-card>
-						<s-card type="filled" clickable="false" style="--s-color-surface-container-highest:var(--s-color-surface-container-low);border-radius:5px; width: 100%;height: 100%;display: block;box-sizing: border-box;">
-						<s-picker-item onclick="setTheme('bySystem')">基于系统</s-picker-item>
-                        <s-picker-item onclick="setTheme('disabled')">亮色模式</s-picker-item>
-                        <s-picker-item onclick="setTheme('enabled')">暗色模式</s-picker-item>
-                        <s-picker-item onclick="setTheme('byTime')">基于时间</s-picker-item>
-						</s-card>						
-					</div>										
-				</s-picker>
-			</s-appbar>
+			
+
+			
+			
+			
+			<s-appbar class="appbar" id="appbar">
+	<s-icon-button slot="navigation" onclick="document.querySelector('s-drawer').toggle()">
+		<s-icon name="menu"></s-icon>
+	</s-icon-button>
+	<div slot="headline"> <?php echo $config['title'];?> </div>
+	<s-picker slot="action">
+		<s-tooltip slot="trigger">
+			<s-icon-button slot="trigger">
+				<s-icon>
+					<svg viewBox="0 -960 960 960">
+						<path
+							d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 32.5-156t88-127Q256-817 330-848.5T488-880q80 0 151 27.5t124.5 76q53.5 48.5 85 115T880-518q0 115-70 176.5T640-280h-74q-9 0-12.5 5t-3.5 11q0 12 15 34.5t15 51.5q0 50-27.5 74T480-80Zm0-400Zm-220 40q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120-160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm200 0q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120 160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17ZM480-160q9 0 14.5-5t5.5-13q0-14-15-33t-15-57q0-42 29-67t71-25h70q66 0 113-38.5T800-518q0-121-92.5-201.5T488-800q-136 0-232 93t-96 227q0 133 93.5 226.5T480-160Z">
+						</path>
+					</svg>
+				</s-icon>
+			</s-icon-button> 主题颜色 
+		</s-tooltip>
+		<div style="width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box;padding: 10px;gad:5px;display:flex;flex-direction:column;">
+			<s-card type="filled" clickable="false" style="--s-color-surface-container-highest:var(--s-color-surface-container-low);margin: 0px 0px 10px 0px;border-radius:5px; width: 100%;height: 80px;display: block; padding: 24px;box-sizing: border-box;">
+				<s-card type="outlined"
+					style="border-radius:18px;height: 18px; width: 150px; display: block; background: linear-gradient(to right,hsl(0, 100%, 50%),hsl(60, 100%, 50%),hsl(120, 100%, 50%),hsl(180, 100%, 50%),hsl(240, 100%, 50%),hsl(300, 100%, 50%),hsl(360, 100%, 50%));"></s-card>
+				<s-slider id="hue-slider" style="margin:10px 0 0 0;" labeled="true" max="359"></s-slider>
+			</s-card>
+			<s-card type="filled" clickable="false" style="--s-color-surface-container-highest:var(--s-color-surface-container-low);border-radius:5px; width: 100%;height: 100%;display: block;box-sizing: border-box;">
+			<s-picker-item onclick="setTheme('bySystem')">基于系统</s-picker-item>
+			<s-picker-item onclick="setTheme('disabled')">亮色模式</s-picker-item>
+			<s-picker-item onclick="setTheme('enabled')">暗色模式</s-picker-item>
+			<s-picker-item onclick="setTheme('byTime')">基于时间</s-picker-item>
+			</s-card>						
+		</div>										
+	</s-picker>
+	
+	<?php if (!$isLoggedIn || !$user_config): ?>
+        <!-- 未登录状态 -->
+        <div class="desktop-buttons auth-dependent" slot="action">
+            <s-button class="login-btn" onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"></path>
+                </svg>                
+                登录
+            </s-button>                 
+            <s-button type="outlined" class="register-btn" onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"></path>
+                </svg>
+                注册
+            </s-button>
+        </div>
+
+        <s-popup-menu class="mobile-menu auth-dependent" slot="action">
+            <s-icon-button slot="trigger">
+                <s-icon name="more_vert"></s-icon>
+            </s-icon-button>
+            <s-popup-menu-item onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"></path>
+                </svg>
+                登录
+            </s-popup-menu-item>
+            <s-popup-menu-item onclick="openLoginDialog()">
+                <svg viewBox="0 -960 960 960" slot="start" width="20" height="20">
+                    <path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"></path>
+                </svg>
+                注册
+            </s-popup-menu-item>
+        </s-popup-menu>
+        <?php else: 
+    $username = isset($user_config['username']) ? $user_config['username'] : '';
+    $firstChar = '?'; // 默认字符
+    if (!empty($username)) {
+        // 优先使用 mb_substr 处理中文，否则用 substr
+        if (function_exists('mb_substr')) {
+            $firstChar = mb_substr($username, 0, 1, 'UTF-8');
+        } else {
+            $firstChar = substr($username, 0, 1);
+        }
+        if ($firstChar === '') {
+            $firstChar = '?';
+        }
+    }
+    $bgColor = !empty($user_config['avatar_color']) ? $user_config['avatar_color'] : 'var(--s-color-primary, #006782)';
+?>
+    <?php if (!empty($user_config['avatar'])): ?>
+        <img class="user-avatar" slot="action" src="<?php echo htmlspecialchars($user_config['avatar']); ?>" 
+             style="display:flex; width:40px; height:40px; border-radius:50%; align-items:center; justify-content:center;">
+    <?php else: ?>
+        <span class="user-avatar" slot="action" 
+              style="background: <?php echo $bgColor; ?>; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;">
+            <?php echo htmlspecialchars($firstChar); ?>
+        </span>
+    <?php endif; ?>
+<?php endif; ?>
+
+</s-appbar>
+
+<s-dialog id="LoginUser">
+<div slot="headline"> 登录 </div>
+<div slot="text"><s-text-field label="请输入用户名" id="username"></s-text-field>
+				<br>
+				<s-text-field label="请输入密码" type="password" id="password"></s-text-field>
+				<br>
+			
+  </div>
+  	<s-button slot="action" id="submit"> 登录 </s-button>
+</s-dialog>
+
 			<s-scroll-view class="main" id="top">

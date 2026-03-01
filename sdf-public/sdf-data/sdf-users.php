@@ -4,7 +4,7 @@ $type = $_REQUEST['type'];
 /* 用switch判断类型 */
 switch($type){
 
-    /* 获取全部话题数据 */
+    /* 获取全部用户数据 */
 	case 'getAllUsers' :
 		$sql = 'SELECT * FROM `sdf-user` order by 1 asc';
 		$result = $db->query($sql);
@@ -18,7 +18,7 @@ switch($type){
 					'user_id' => $v['user_id'],
 					'username' => $v['username'],
 					'avatar' => $v['avatar'],
-					'avatar-color' => $v['avatar-color'],
+					'avatar_color' => $v['avatar_color'],
 					'headline' => $v['headline']			
 				);
 			}

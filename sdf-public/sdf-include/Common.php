@@ -39,10 +39,10 @@ function json($code, $msg, $data)
  * 判断用户是否登录到后台
  *	@return bool 是否登录
  */
-function isAdmin()
+function isLogin()
 {
 	session_start();
-	if ($_SESSION['login'] == 'admin') {
+	if ($_SESSION['login'] == 'login' && (isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)) {
 		return true;
 	} else {
 		return false;
@@ -53,11 +53,12 @@ function isAdmin()
  * 清除登录session（退出登录）
  *	@return bool 清除是否成功
  */
-function clearAdmin()
+function clearLogin()
 {
 	session_start();
-	if ($_SESSION['login'] == 'admin') {
+	if ($_SESSION['login'] == 'login') {
 		unset($_SESSION['login']);
+		unset($_SESSION['user_id']);
 		return true;
 	} else {
 		return false;

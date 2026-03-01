@@ -34,7 +34,7 @@ switch($type){
 		}
 		break;
 		
-    /* 获取全部关注话题人ID，头像，名字 */	
+    /* 获取全部关注话题人ID，头像，头像颜色，名字 */	
     case 'getAllTopicsfollow' :
         $sql = 'SELECT * FROM `sdf-topic` ORDER BY 1 ASC';
         $result = $db->query($sql);
@@ -55,7 +55,7 @@ switch($type){
                 if (!empty($followerIds)) {
                     // 将ID数组转为逗号分隔的字符串，注意防止SQL注入（这里ID是数字，相对安全，但建议使用参数化查询）
                     $ids = implode(',', array_map('intval', $followerIds));
-                    $userSql = "SELECT `user_id`, `username`, `avatar`, `avatar-color` FROM `sdf-user` WHERE `user_id` IN ($ids)";
+                    $userSql = "SELECT `user_id`, `username`, `avatar`, `avatar_color` FROM `sdf-user` WHERE `user_id` IN ($ids)";
                     $userResult = $db->query($userSql);
                     if ($userResult) {
                         while ($user = $userResult->fetch_assoc()) {
@@ -63,7 +63,7 @@ switch($type){
                                 'user_id' => $user['user_id'],
                                 'username' => $user['username'],
                                 'avatar' => $user['avatar'],
-                                'avatar-color' => $user['avatar-color']
+                                'avatar_color' => $user['avatar_color']
                             ];
                         }
                     }

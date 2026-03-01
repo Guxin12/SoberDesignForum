@@ -190,6 +190,7 @@ s-card s-icon-button  s-icon {
     display: flex;
     flex-direction: column;
     min-height: 200px;
+    position: relative; /* 为子元素绝对定位提供参考 */
 }
 
 /* 卡片内容容器 */
@@ -257,15 +258,20 @@ s-card s-icon-button  s-icon {
     line-height: 1.2;
 }
 
-/* 卡片操作区域 */
+/* 卡片操作区域 - 已改为固定定位 */
 .card-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 6px); /* 减去左右边距 */
     margin-top: auto;
     box-sizing: border-box;
-    padding-top: 12px;
+    padding: 8px 12px;
+    position: absolute; /* 绝对定位 */
+    left: 3px; /* 距离左边框3px */
+    bottom: 3px; /* 距离下边框3px */
+    background-color: transparent; /* 透明背景，可根据需要调整 */
+    z-index: 1; /* 确保在其他内容之上 */
 }
 
 /* 图标按钮样式 */
@@ -278,91 +284,167 @@ s-card s-icon-button  s-icon {
     border-radius: 50%;
 }
 
-/* 平板：宽度 ≥ 600px，3列 */
-@media (min-width: 600px) {
-    .card-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        padding: 24px;
-    }
-    
-    .user-card {
-        min-height: 220px;
-    }
-    
-    .avatar-circle {
-        width: 90px;
-        height: 90px;
-    }
-    
-    .avatar-letter {
-        font-size: 40px;
-    }
-    
-    .username {
-        font-size: 20px;
-    }
-}
-
-/* 电脑端：宽度 ≥ 900px，4列 */
-@media (min-width: 900px) {
-    .card-grid {
-        grid-template-columns: repeat(4, 1fr); /* 电脑端统一为4列 */
-        gap: 20px;
-    }
-    
-    .user-card {
-        min-height: 230px;
-    }
-    
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .avatar-letter {
-        font-size: 44px;
-    }
-    
-    .username {
-        font-size: 22px;
-    }
-}
-
-/* 移除原来的电脑大屏和超大屏断点，统一使用4列布局 */
-
-/* 修复原有手机端高度设置 */
+/* --- 手机端修改 (最大宽度 599.9px) --- */
 @media (max-width: 599.9px) {
     .card-grid {
         padding: 16px;
         gap: 12px;
     }
     
+    /* 确保卡片高度为220px */
     .user-card {
-        min-height: 180px;
+        min-height: 220px;
+        height: 220px;
     }
     
     .avatar-circle {
-        width: 70px;
-        height: 70px;
+        width: 83px; /* 略微缩小，为上方留出空间 */
+        height: 83px;
     }
     
     .avatar-letter {
-        font-size: 32px;
+        font-size: 45px;
+    }
+    
+    /* 为头像容器添加上边距 */
+    .avatar-container {
+        margin-top: 7px; /* 按您的要求添加 */
+        margin-bottom: 12px; /* 略微减小下边距，平衡整体高度 */
     }
     
     .username {
-        font-size: 16px;
+        font-size: 18px;
+        margin-bottom: 2px; /* 微调间距 */
     }
     
     .user-role {
-        font-size: 13px;
+        font-size: 15px;
+        line-height: 1.9;
     }
     
+    /* 调整卡片内部填充，为固定操作区域留出空间 */
     .card-content {
-        padding: 16px 12px;
+        padding: 5px 10px 50px; /* 增加底部内边距，避免内容被操作区域遮挡 */
+    }
+    
+    /* 手机端操作区域固定定位 */
+    .card-actions {
+        width: calc(100% - 14px); /* 宽度减去左右边距 */
+        padding: 0;
+        position: absolute; /* 绝对定位 */
+        left: 7px; /* 距离左边框3px */
+        bottom: 7px; /* 距离下边框3px */
+        margin-top: 0; /* 移除自动上边距 */                
     }
 }
+
+/* --- 平板端修改 (宽度 600px 至 899.9px) --- */
+@media (min-width: 600px) and (max-width: 899.9px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 24px;
+    }
+    
+    /* 平板端卡片固定高度为250px */
+    .user-card {
+        height: 250px;
+    }
+    
+    .avatar-circle {
+        width: 95px; /* 比手机端更大 */
+        height: 95px;
+    }
+    
+    .avatar-letter {
+        font-size: 50px; /* 比手机端更大 */
+    }
+    
+    .avatar-container {
+        margin-top: 10px; /* 调整上边距 */
+        margin-bottom: 9px; /* 调整下边距 */
+    }
+    
+    .username {
+        font-size: 22px; /* 比手机端更大 */
+        margin-bottom: 4px;
+    }
+    
+    .user-role {
+        font-size: 18px; /* 比手机端更大 */
+        line-height: 2.0;
+    }
+    
+    /* 调整卡片内部填充，为固定操作区域留出空间 */
+    .card-content {
+        padding: 10px 12px 60px; /* 增加底部内边距 */
+    }
+    
+    /* 平板端操作区域固定定位，与手机端一致 */
+    .card-actions {
+        width: calc(100% - 14px); /* 宽度减去左右边距 */
+        padding: 0;
+        position: absolute; /* 绝对定位 */
+        left: 7px; /* 距离左边框7px */
+        bottom: 7px; /* 距离下边框7px */
+        margin-top: 0; /* 移除自动上边距 */
+    }
+}
+
+/* --- 电脑端修改 (宽度 ≥ 900px) --- */
+@media (min-width: 900px) {
+    .card-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    /* 电脑端卡片固定高度为250px */
+    .user-card {
+        height: 250px;
+    }
+    
+    .avatar-circle {
+        width: 95px; /* 比平板端更大 */
+        height: 95px;
+    }
+    
+    .avatar-letter {
+        font-size: 55px; /* 比平板端更大 */
+    }
+    
+    .avatar-container {
+        margin-top: 10px; /* 调整上边距 */
+        margin-bottom: 15px; /* 调整下边距 */
+    }
+    
+    .username {
+        font-size: 20px; /* 比平板端更大 */
+        margin-bottom: 4px;
+    }
+    
+    .user-role {
+        font-size: 17px; /* 比平板端更大 */
+        line-height: 2;
+    }
+    
+    /* 调整卡片内部填充，为固定操作区域留出空间 */
+    .card-content {
+        padding: 10px 12px 60px; /* 增加底部内边距 */
+    }
+    
+    /* 电脑端操作区域固定定位，与手机端一致 */
+    .card-actions {
+        width: calc(100% - 14px); /* 宽度减去左右边距 */
+        padding: 0;
+        position: absolute; /* 绝对定位 */
+        left: 7px; /* 距离左边框7px */
+        bottom: 7px; /* 距离下边框7px */
+        margin-top: 0; /* 移除自动上边距 */
+    }
+}
+
+
+
 
 /* s-empty 空状态居中显示 */
 .card-grid s-empty {
